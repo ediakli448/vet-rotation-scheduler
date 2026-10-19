@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>פורטל סטודנטים – שנה ד׳ ברפואה וטרינרית</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="st">
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --font:'IBM Plex Sans Hebrew','Rubik','Segoe UI',Arial,sans-serif;
+  --bg:#EEF3F2;--surface:#FFFFFF;--surface-2:#F6F9F8;--ink:#12262A;--muted:#566A6D;--line:#D3DDDB;
+  --scrub:#0E6B63;--scrub-ink:#FFFFFF;--scrub-soft:#D6ECE8;
+  --me:#946300;--me-bg:#F5E7C4;--sec:#5B45A6;--sec-bg:#E5DFF5;--free:#1D62A3;--free-bg:#D9E7F5;--vac:#7F8C8F;
+  --alarm:#B42318;--alarm-bg:#FCE3DF;--ok:#17744A;--ok-bg:#DAF0E3;--warn:#9A5B00;--warn-bg:#FBEBCD;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1618;--surface:#132124;--surface-2:#18292C;--ink:#E2EBE9;--muted:#95A7AA;--line:#28393C;
+  --scrub:#3DB2A4;--scrub-ink:#07201D;--scrub-soft:#173A37;--me:#E6B84E;--me-bg:#3A2E11;--sec:#B6A6F2;--sec-bg:#2A2344;--free:#82B8EE;--free-bg:#15304B;--vac:#8E9C9F;
+  --alarm:#FF8B7C;--alarm-bg:#3E1813;--ok:#6CD39B;--ok-bg:#143322;--warn:#F0B454;--warn-bg:#382810;}}
+:root[data-theme="dark"]{
+  --bg:#0C1618;--surface:#132124;--surface-2:#18292C;--ink:#E2EBE9;--muted:#95A7AA;--line:#28393C;
+  --scrub:#3DB2A4;--scrub-ink:#07201D;--scrub-soft:#173A37;--me:#E6B84E;--me-bg:#3A2E11;--sec:#B6A6F2;--sec-bg:#2A2344;--free:#82B8EE;--free-bg:#15304B;--vac:#8E9C9F;
+  --alarm:#FF8B7C;--alarm-bg:#3E1813;--ok:#6CD39B;--ok-bg:#143322;--warn:#F0B454;--warn-bg:#382810;}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--font);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--scrub);outline-offset:2px}
+h1,h2,h3{margin:0;line-height:1.25}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 64px}
+header{background:var(--scrub);color:var(--scrub-ink);padding:26px 0 0;margin-bottom:18px}
+header .wrap{padding-bottom:0}
+header h1{font-size:clamp(24px,5vw,32px);font-weight:700;letter-spacing:-.01em}
+header p{margin:6px 0 0;opacity:.88;max-width:60ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 18px 14px;margin-bottom:14px}
+.card h2{font-size:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.card h2 .step{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--scrub-soft);color:var(--scrub);font-size:14px;font-weight:700}
+.card .sub{color:var(--muted);font-size:14px;margin:0 0 12px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.field>span{font-size:14px;color:var(--muted)}
+.field>span b{color:var(--alarm);font-weight:600}
+input[type=text],input[type=email],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);min-width:0}
+textarea{min-height:84px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:540px){.grid2{grid-template-columns:1fr}}
+.meter{font-size:13px;font-weight:600;padding:1px 10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.meter.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.meter.bad{background:var(--alarm-bg);color:var(--alarm);border-color:transparent}
+.pick-row{display:grid;grid-template-columns:1fr 112px 40px;gap:6px;margin-bottom:8px}
+.pick-row.fix{grid-template-columns:1fr 158px 40px}
+@media (max-width:420px){.pick-row.fix{grid-template-columns:1fr 40px}.pick-row.fix input{grid-column:1;grid-row:2}}
+.icon-btn{appearance:none;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;cursor:pointer;color:var(--muted)}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:10px;cursor:pointer;font-weight:500}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{border-style:dashed;background:transparent}
+.btn.primary{background:var(--scrub);border-color:var(--scrub);color:var(--scrub-ink);font-weight:600;padding:12px 22px;font-size:17px}
+.notes{margin:8px 0 0;padding-inline-start:18px;font-size:14px;color:var(--muted)}
+.notes b{color:var(--ink)}
+.dow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.dow label{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:14px;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.chips button{appearance:none;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:3px 10px;font-size:14px;cursor:pointer}
+.inline{display:flex;gap:8px;align-items:center}
+.inline input{flex:1}
+.errors{background:var(--alarm-bg);border-radius:12px;padding:12px 16px;margin-bottom:14px}
+.errors strong{display:block;margin-bottom:4px}
+.errors ul{margin:0;padding-inline-start:18px}
+.result{background:var(--surface);border:2px solid var(--scrub);border-radius:14px;padding:18px;margin-bottom:14px}
+.result h2{font-size:20px;margin-bottom:6px}
+.result textarea{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;direction:ltr;text-align:left;min-height:110px;margin:8px 0}
+.row-btns{display:flex;flex-wrap:wrap;gap:8px}
+.muted{color:var(--muted);font-size:14px}
+details{margin-top:6px}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+.toast{position:fixed;inset-inline-start:50%;transform:translateX(50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;max-width:92vw}
+.toast.show{opacity:1}
+
+:root{--core:#0E6B63;--core-bg:#D6ECE8;--vac-bg:#E7ECEC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--core:#6BD0C3;--core-bg:#163835;--vac-bg:#1B292B}}
+:root[data-theme="dark"]{--core:#6BD0C3;--core-bg:#163835;--vac-bg:#1B292B}
+.ptabs{display:flex;gap:2px;margin-top:16px;overflow-x:auto;scrollbar-width:none}
+.ptabs::-webkit-scrollbar{display:none}
+.ptabs button{appearance:none;border:0;background:transparent;color:inherit;opacity:.8;padding:10px 14px 12px;font-weight:500;border-radius:10px 10px 0 0;cursor:pointer;white-space:nowrap}
+.ptabs button[aria-selected="true"]{background:var(--bg);color:var(--ink);opacity:1;font-weight:600}
+.btn.sm{padding:6px 12px;font-size:14px}
+.btn.danger{color:var(--alarm)}
+.err{color:var(--alarm);font-size:14px;margin:8px 0 0}
+.okmsg{color:var(--ok);font-size:14px}
+.inline-check{display:inline-flex;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+.me-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.now{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.now div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid}
+.now .lbl{font-size:12px;color:var(--muted)}
+.now b{font-size:17px}
+.now small{color:var(--muted);font-size:13px}
+.notice{background:var(--warn-bg);border-radius:12px;padding:12px 16px;margin-bottom:14px}
+.notice strong{display:block}
+.upd{display:inline-block;margin-inline-start:6px;font-size:11px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--warn);color:#fff;vertical-align:middle}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:78px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);align-items:start}
+.tl li.past{opacity:.5}
+.tl li.current{background:var(--scrub-soft);border-radius:10px;padding:8px;margin:2px -8px;border-bottom:0}
+.tl .when{font-size:12px;color:var(--muted);line-height:1.35}
+.tl .when b{display:block;color:var(--ink);font-size:14px}
+.tl .what{display:grid;gap:4px}
+.chip{--c:var(--core);--cbg:var(--core-bg);background:var(--cbg);border-inline-start:3px solid var(--c);border-radius:8px;padding:6px 10px;font-size:14px;font-weight:500;line-height:1.35}
+.chip small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.cat-core{--c:var(--core);--cbg:var(--core-bg)}
+.cat-me{--c:var(--me);--cbg:var(--me-bg)}
+.cat-sec{--c:var(--sec);--cbg:var(--sec-bg)}
+.cat-free{--c:var(--free);--cbg:var(--free-bg)}
+.cat-vac{--c:var(--vac);--cbg:var(--vac-bg)}
+.chip.cat-vac{background:repeating-linear-gradient(135deg,var(--vac-bg) 0 6px,transparent 6px 11px);color:var(--muted)}
+.shl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
+.shl li{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.shl li.past{opacity:.5}
+.pill{font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;margin-inline-start:auto}
+.pill.er{background:var(--alarm-bg);color:var(--alarm)}
+.pill.dept{background:var(--sec-bg);color:var(--sec)}
+.radios{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px}
+.radio{display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);cursor:pointer;font-size:15px}
+.radio:has(input:checked){border-color:var(--scrub);background:var(--scrub-soft)}
+.foot{text-align:center;margin-top:30px}
+.linkbtn{appearance:none;border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script type="application/json" id="pubdata">null</script>
+<script id="main">/*LOGIC-START*/
+// ================= Catalog (from project knowledge files 02–06) =================
+const YEAR = 'תשפ״ז';
+const COURSES = [
+  {k:'SAS',  n:'כירורגיה חיות קטנות', s:'כירורגיה', code:'65794', core:3, len:[2], note:'מהיום הראשון להגיע מוכנים לביצוע עיקור או סירוס'},
+  {k:'SAM',  n:'רפואת חיות קטנות', s:'פנימית ח״ק', code:'65763', core:3, len:[2]},
+  {k:'ER',   n:'רפואת חירום', s:'חירום', code:'65790', core:3, len:[2], note:'בארבעת הבלוקים הראשונים – לפחות 2 סטודנטים עם ניסיון טכני'},
+  {k:'EQ',   n:'רפואה וכירורגיה סוסים', s:'סוסים', code:'65761', core:2, len:[2], note:'4 שבועות רצופים'},
+  {k:'PH',   n:'בריאות הציבור', s:'בריאות ציבור', code:'65767', core:1, len:[2], note:'מצגת קבוצתית באנגלית בסוף הבלוק'},
+  {k:'ANES', n:'הרדמה', s:'הרדמה', code:'65786', core:1, len:[2], note:'בוחן כניסה ביום הראשון (כישלון בשני ניסיונות = כישלון בבלוק)'},
+  {k:'SPAY', n:'התנסות מעשית בעיקורים, סירוסים וכלביות', s:'עיקורים', code:'65867', core:1, len:[2], note:'דרישת קדם: בלוק הרדמה (תשפ״ז); בתשפ״ו: בלוק כירורגיה'},
+  {k:'FARM', n:'עופות משק, חזירים, צאן ודגים', s:'משק משולב', code:'65764', core:1, len:[2], note:'שבוע עופות + שבוע חזירים/צאן'},
+  {k:'PATH', n:'פתולוגיה', s:'פתולוגיה', code:'65765', core:1, len:[2], note:'מעבר על הוראות בטיחות ופרוטוקול נתיחה לפני הבלוק'},
+  {k:'RAD',  n:'רדיולוגיה', s:'רדיולוגיה', code:'65785', core:1, len:[2]},
+  {k:'AMB',  n:'רפואה אמבולטורית של חיות משק', s:'אמבולטורי משק', code:'65760', core:1, len:[2], note:'בבלוק עם חג – 2 סטודנטים, ברגיל 3'},
+  {k:'DIAG', n:'מעבדות אבחון במכון הווטרינרי', s:'מעבדות', code:'65866', core:1, len:[1], note:'כל שינוי בשיבוץ מחייב עדכון המכון'},
+  {k:'ME_FARM', n:'רפואת חיות משק – בחירה', s:'משק (ב)', code:'65796', list:'L3', len:[2]},
+  {k:'ME_EQ',   n:'רפואה וכירורגיה סוסים – בחירה', s:'סוסים (ב)', code:'65797', list:'L3', len:[2]},
+  {k:'ME_SAM',  n:'רפואת חיות קטנות – בחירה', s:'פנימית (ב)', code:'65798', list:'L3', len:[2]},
+  {k:'ME_SAS',  n:'כירורגיה חיות קטנות – בחירה', s:'כירורגיה (ב)', code:'65799', list:'L3', len:[2]},
+  {k:'ME_ER',   n:'רפואת חירום – בחירה', s:'חירום (ב)', code:'65806', list:'L3', len:[2]},
+  {k:'OPH',    n:'אופתלמולוגיה', s:'עיניים', code:'65715 / 65775', list:'L4', len:[1,2], appr:{text:'השיבוצים נשלחים לאישור המחלקה לפני פרסום'}},
+  {k:'DERM',   n:'דרמטולוגיה', s:'עור', code:'65724 / 65822', list:'L4', len:[1,2], note:'בתשפ״ז מתקיים רק כבלוק שבועיים'},
+  {k:'THERIO', n:'טריוגנולוגיה', s:'טריוגנולוגיה', code:'65858 / 65807', list:'L4', len:[1,2], appr:{text:'אישור מראש ממרכז הבלוק', only1:true}},
+  {k:'NEURO',  n:'נוירולוגיה (בית דגן)', s:'נוירולוגיה', code:'65722 / 65821', list:'L4', len:[1], note:'שבוע אחד בלבד – בלוק השבועיים אינו מתקיים'},
+  {k:'ONCOCARD',n:'אונקולוגיה / קרדיולוגיה / טריוגנולוגיה – בלוק משולב', s:'אונקו/קרדיו', code:'', list:'L4', len:[1], note:'בלוק שבוע; קוד קורס טרם פורסם'},
+  {k:'CARDIO', n:'קרדיולוגיה', s:'קרדיולוגיה', code:'65747 / 65841', list:'L4', len:[1,2], cancelled:true},
+  {k:'ANES_EL',n:'הרדמה – בחירה', s:'הרדמה (ב)', code:'65741 / 65808', list:'L4', len:[1,2]},
+  {k:'NEURONC',n:'נוירולוגיה ואונקולוגיה – בלוק משולב', s:'נוירו-אונקו', code:'65844', list:'L4', len:[2]},
+  {k:'TRACKS', n:'חטיבות בחירה א׳, ב׳, ג׳', s:'חטיבות', code:'65707, 65863, 65782, 65756, 65762', list:'L5', len:[1,2]},
+  {k:'SHELTER',n:'רפואת מחסה – מחלקת אסופיים, בית דגן', s:'אסופיים', code:'65860 / 65862', list:'L5', len:[1,2], note:'מלגת אסופיים: שבועיים ותורנויות נוספות מחוץ למכסת ה-15'},
+  {k:'DENT',   n:'רפואת שיניים בחיות מחמד (ד״ר חני קפלן רצקין)', s:'שיניים', code:'65755 / 65856', list:'L5', len:[1,2], ext:true, appr:{text:'תיאום תאריכים מול מרכז הבלוק', d30:true}},
+  {k:'KENNEL', n:'רפואת כלביות', s:'כלביות', code:'65811', list:'L5', len:[1]},
+  {k:'KENNEL_LOD', n:'רפואת כלביות – עיריית לוד', s:'כלביית לוד', code:'65811', list:'L5', len:[1,2], ext:true},
+  {k:'KENNEL_RLZ', n:'רפואת כלביות – עיריית ראשון לציון', s:'כלביית ראשל״צ', code:'65811', list:'L5', len:[1,2], ext:true, note:'עדיפות לבוגרי בריאות הציבור מורחב; בלוק שנופל על חג – ייתכן השלמה ביום שישי'},
+  {k:'CONSERV',n:'שמירת טבע וטרינרית ובריאות אחת (רט״ג)', s:'שמירת טבע', code:'65861 / 65868', list:'L5', len:[1,2], capFixed:2, note:'עד 2 סטודנטים בבלוק'},
+  {k:'PH_EL',  n:'בריאות ציבור – בחירה', s:'בר״צ (ב)', code:'65831 / 65865', list:'L5', len:[1,2]},
+  {k:'IDF',    n:'בריאות צה״ל', s:'צה״ל', code:'', list:'L5', len:[1,2], ext:true, appr:{text:'תיאום תאריכים מול מרכז הבלוק', d30:true}},
+  {k:'ABROAD', n:'בלוק חו״ל', s:'חו״ל', code:'65749 / 65788', list:'L5', len:[1,2], ext:true, appr:{text:'אישור מראש של יו״ר שנה ד׳', d30:true, form:'טופס הערכה חתום מהמוסד הקולט'}},
+  {k:'PRIVATE',n:'מרפאה חיות קטנות (מרפאה פרטית)', s:'מרפאה פרטית', code:'65778 / 65750', list:'L5', len:[1,2], ext:true, appr:{text:'אישור מראש של יו״ר שנה ד׳', d30:true, form:'טופס הערכה חתום מהרופא'}},
+  {k:'KOLHAI', n:'מרפאת כל חי ברחובות (אקזוטיות)', s:'כל חי', code:'65750 / 65778', list:'L5', len:[1,2], ext:true, appr:{text:'תיאום תאריכים ושיחה מקדימה עם ד״ר אורן אולמן', d30:true, form:'טופס הסכמה חתום'}},
+  {k:'BS_IM',  n:'רפואה פנימית – ד״ר רן ניבי, בן שמן', s:'פנימית בן שמן', code:'', list:'L5', len:[1,2], ext:true, appr:{text:'תיאום תאריכים מול מרכז הבלוק', d30:true}},
+  {k:'BS_ER',  n:'חירום וטיפול נמרץ – בן שמן', s:'חירום בן שמן', code:'', list:'L5', len:[1,2], ext:true},
+  {k:'BS_SURG',n:'כירורגיה – בן שמן', s:'כירורגיה בן שמן', code:'', list:'L5', len:[1,2], ext:true, appr:{text:'תיאום תאריכים מול מרכז הבלוק', d30:true}},
+  {k:'EYECARE',n:'אופתלמולוגיה – EYE CARE', s:'EYE CARE', code:'', list:'L5', len:[1], ext:true, appr:{text:'תיאום תאריכים מול מרכז הבלוק', d30:true}},
+  {k:'VETCENTER',n:'וט סנטר (מרכז מומחים וטיפול נמרץ)', s:'וט סנטר', code:'', list:'L5', len:[1], ext:true},
+  {k:'HAVAT',  n:'חוות דעת (כפר סבא)', s:'חוות דעת', code:'', list:'L5', len:[1,2], ext:true},
+  {k:'CHAKLAIT',n:'החקלאית – חיות משק', s:'החקלאית', code:'65780', list:'L5', len:[2], ext:true, appr:{text:'תיאום מול הווטרינר; וטרינר שאינו ברשימת הפרוטוקול – באישור ד״ר שני שיינין', d30:true}},
+  {k:'EQ_AMB', n:'רפואה אמבולטורית סוסים', s:'אמבולטורי סוסים', code:'65789 / 65805', list:'L5', len:[2], note:'רגיל או מורחב; בתיאום מול וטרינר סוסים'},
+  {k:'WILD',   n:'רפואת חיות בר / גני טבע / חיו״ק לא מתורבתות', s:'חיות בר', code:'65769 / 65842', list:'L5', len:[2], ext:true, appr:{text:'בספארי ובגן החיות התנ״כי: אישור אוטומטי, בהודעה מראש', d30:true}},
+  {k:'SAFARI', n:'הספארי ברמת גן', s:'ספארי', code:'65769', list:'L5', len:[2], ext:true, appr:{text:'הודעה למרכז הבלוק ביום חמישי שלפני הבלוק'}},
+  {k:'BZOO',   n:'גן החיות התנ״כי', s:'גן התנ״כי', code:'65769', list:'L5', len:[2], ext:true, note:'קריאת המאמרים שיישלחו מראש'},
+  {k:'POULTRY_EL',n:'רפואת עופות – בחירה', s:'עופות (ב)', code:'65801', list:'L5', len:[2]},
+  {k:'RAD_EL', n:'רדיולוגיה – בחירה (מורחב)', s:'רדיולוגיה (ב)', code:'65804', list:'L5', len:[2], note:'אי אפשר לשלב בין חובה למורחב'},
+  {k:'PATH_EL',n:'פתולוגיה – בחירה', s:'פתולוגיה (ב)', code:'65802', list:'L5', len:[2], appr:{text:'אישור מרכז הבלוק'}},
+  {k:'LAB',    n:'חיות מעבדה', s:'חיות מעבדה', code:'65768', list:'L5', len:[2]},
+  {k:'PHYSIO', n:'שיקום ופיזיותרפיה – ד״ר חן קוליק', s:'פיזיו קוליק', code:'65849', list:'L5', len:[1], ext:true, note:'רצוי אחרי כירורגיה ונוירולוגיה'},
+  {k:'VIPET',  n:'שיקום ופיזיותרפיה – V.I.PET כפר טרומן', s:'V.I.PET', code:'', list:'L5', len:[1,2], ext:true},
+  {k:'NEURO_SEL',n:'נוירולוגיה בבן שמן (פרקים נבחרים)', s:'נוירו בן שמן', code:'65851', list:'L5', len:[1], ext:true, note:'2–3 סטודנטים, אחרי נוירולוגיה בבית דגן'},
+  {k:'ESHEL',  n:'עיקורים וסירוסים – אשל הנשיא', s:'ע/ס אשל', code:'', list:'L5', len:[2], ext:true, note:'להגיע מוכנים, להתאמן על pedicle tie'},
+  {k:'CSKILLS',n:'מיומנויות קליניות – חיות קטנות', s:'מיומנויות', code:'', list:'L5', len:[2], startBy:12, note:'נפתח רק מ-35 נרשמים. השבוע הראשון בבלוקים 1–6 או כבלוק מוקדם'},
+  {k:'WELFARE',n:'פיקוח על חוק צער בעלי חיים', s:'צער ב״ח', code:'65829', list:null, len:[], cancelled:true},
+];
+const C = Object.fromEntries(COURSES.map(c => [c.k, c]));
+const CORE = COURSES.filter(c => c.core);
+const LIVE = COURSES.filter(c => !c.cancelled);
+const L3 = COURSES.filter(c => c.list === 'L3').map(c => c.k);
+const ALLOWED = {
+  me: L3,
+  sec: COURSES.filter(c => (c.list === 'L3' || c.list === 'L4') && !c.cancelled).map(c => c.k),
+  free: COURSES.filter(c => ['L3','L4','L5'].includes(c.list) && !c.cancelled).map(c => c.k),
+};
+const CATS = {core:'ליבה', me:'בחירת חובה', sec:'בחירה משנית', free:'בחירה חופשית', vac:'חופשה'};
+const CORE_WEEKS = CORE.reduce((a, c) => a + c.core * c.len[0], 0); // 37
+const REQ_SEC = 4, REQ_FREE = 5;
+// no on-call shifts during vacation or rotations held outside the teaching hospital
+const OFFSITE = new Set(COURSES.filter(c => c.ext).map(c => c.k));
+const SHIFT_Q = {er: 10, dept: 5};
+const SHIFT_T = {er: 'חירום', dept: 'מחלקות'};
+
+// ---- prerequisites (each group in `need` is "one of"; all groups are required) ----
+const PREREQS = [
+  {id: 'spay-anes', t: ['SPAY'], need: [['ANES', 'ANES_EL']], lbl: ['הרדמה'], src: 'קובץ השיבוצים תשפ״ז', text: 'עיקורים וסירוסים אחרי בלוק הרדמה'},
+  {id: 'spay-sas', t: ['SPAY'], need: [['SAS', 'ME_SAS']], lbl: ['בלוק כירורגיה'], src: 'פרוטוקול תשפ״ו (קובץ 02)', text: 'עיקורים וסירוסים אחרי בלוק כירורגיה חיות קטנות'},
+  {id: 'eshel', t: ['ESHEL'], need: [['SPAY']], lbl: ['עיקורים וסירוסים רגיל'], src: 'קובץ השיבוצים תשפ״ז', text: 'אשל הנשיא אחרי בלוק עיקורים וסירוסים רגיל'},
+  {id: 'oph', t: ['OPH'], need: [['SAM', 'ME_SAM']], lbl: ['פנימית'], src: 'קובץ השיבוצים תשפ״ז', text: 'אופתלמולוגיה רק אחרי בלוק פנימית'},
+  {id: 'derm', t: ['DERM'], need: [['ER', 'ME_ER', 'SAM', 'ME_SAM']], lbl: ['חירום או פנימית'], techOk: true, src: 'קובץ השיבוצים תשפ״ז', text: 'דרמטולוגיה אחרי חירום או פנימית (טכנאים פטורים)'},
+  {id: 'shelter', t: ['SHELTER'], need: [['ER', 'ME_ER', 'SAM', 'ME_SAM']], lbl: ['חירום או פנימית'], techOk: true, src: 'קובץ השיבוצים תשפ״ז', text: 'אסופיים אחרי חירום או פנימית (טכנאים פטורים)'},
+  {id: 'bsneuro', t: ['NEURO_SEL'], need: [['NEURO', 'NEURONC']], lbl: ['נוירולוגיה בבית דגן'], src: 'קובץ השיבוצים תשפ״ז', text: 'נוירולוגיה בן שמן אחרי נוירולוגיה בבית דגן'},
+  {id: 'lod', t: ['KENNEL_LOD'], need: [['ANES', 'ANES_EL'], ['SAS', 'ME_SAS'], ['ER', 'ME_ER']], lbl: ['הרדמה', 'כירורגיה', 'חירום'], src: 'קובץ השיבוצים תשפ״ז', text: 'כלביית לוד אחרי הרדמה, כירורגיה וחירום'},
+];
+function reqFor(cfg) {
+  const vb = cfg && Number.isFinite(+cfg.vacBlocks) && +cfg.vacBlocks > 0 ? +cfg.vacBlocks : 2;
+  const r = {core: CORE_WEEKS, me: 2, sec: REQ_SEC, free: REQ_FREE, vac: vb * 2};
+  r.total = r.core + r.me + r.sec + r.free + r.vac;
+  return r;
+}
+const weeksOf = rows => (rows || []).reduce((a, r) => a + (+r.w || 0), 0);
+const parseCell = s => { const [c, cat] = String(s).split('|'); return {c, cat}; };
+const label = c => c === 'VAC' ? 'חופשה' : (C[c] ? C[c].s || C[c].n : c);
+const fullName = c => c === 'VAC' ? 'חופשה' : (C[c] ? C[c].n : c);
+const isoOf = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const fmtIso = s => { const [y, m, d] = String(s).split('-'); return `${d}.${m}.${String(y).slice(2)}`; };
+function dayIndex(dstr, start) {
+  const [y, m, d] = String(dstr).split('-').map(Number);
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())) / 864e5);
+}
+
+function validateChoices(s) {
+  const errs = [];
+  if (!s.me || !L3.includes(s.me)) errs.push('לא נבחר בלוק בחירת חובה');
+  for (const cat of ['sec', 'free']) {
+    const rows = s[cat] || [], lbl = cat === 'sec' ? 'בחירה משנית' : 'בחירה חופשית';
+    const req = cat === 'sec' ? REQ_SEC : REQ_FREE, sum = weeksOf(rows);
+    if (sum !== req) errs.push(`${lbl}: ${sum} מתוך ${req} שבועות`);
+    const seen = new Set();
+    rows.forEach(r => {
+      const c = C[r.c];
+      if (!c) { errs.push(`${lbl}: יש שורה ללא קורס`); return; }
+      if (c.cancelled) errs.push(`${c.n} אינו מתקיים בשנת ${YEAR}`);
+      else if (!ALLOWED[cat].includes(r.c)) errs.push(`${c.n} אינו ברשימה המותרת ל${lbl}`);
+      else if (!c.len.includes(+r.w)) errs.push(`${c.n}: אורך ${r.w} שבועות אינו אפשרי`);
+      if (seen.has(r.c)) errs.push(`${lbl}: ${c.n} נבחר פעמיים`);
+      seen.add(r.c);
+    });
+  }
+  return errs;
+}
+
+// soft checks shown in the edit sheet (they do not block scheduling)
+function choiceWarnings(s, off) {
+  const w = [], chosen = new Set([s.me, ...(s.sec || []).map(r => r.c), ...(s.free || []).map(r => r.c)].filter(Boolean));
+  [['secBk', 'sec', 'בחירה משנית'], ['freeBk', 'free', 'בחירה חופשית']].forEach(([f, cat, lbl]) => {
+    const b = s[f]; if (!b || !b.c) { w.push(`לא נבחר בלוק גיבוי ל${lbl}`); return; }
+    if (!C[b.c] || C[b.c].cancelled) w.push(`בלוק הגיבוי ל${lbl} אינו מתקיים`);
+    else if (!ALLOWED[cat].includes(b.c)) w.push(`בלוק הגיבוי ל${lbl} אינו ברשימה המותרת`);
+    if (chosen.has(b.c)) w.push(`בלוק הגיבוי ל${lbl} (${fullName(b.c)}) כבר נמצא בין הבחירות – הגיבוי "מבוזבז"`);
+  });
+  PREREQS.forEach(r => {
+    if ((off || {})[r.id]) return;
+    const t = r.t.find(k => chosen.has(k)); if (!t) return;
+    r.need.forEach((g, i) => { if (!g.some(k => (C[k] && C[k].core) || chosen.has(k))) w.push(`${fullName(t)} מחייב קודם ${r.lbl[i]}, שאינו בין הבחירות`); });
+  });
+  if (s.skills && !(s.free || []).some(r => r.c === 'CSKILLS')) {
+    const drop = new Set(s.skillsDrop || []), dw = (s.free || []).filter(r => drop.has(r.c)).reduce((a, r) => a + (+r.w || 0), 0);
+    if (dw !== 2) w.push(`בלוק מיומנויות: יש לסמן בלוקים מהבחירה החופשית שמסתכמים בשבועיים לוויתור (כרגע ${dw})`);
+  }
+  return w;
+}
+
+const CASE_FIELDS = {im: 'רפואה פנימית', er: 'רפואת חירום', surg: 'כירורגיה', spec: 'התמחויות'};
+// ---- request code: shared by the student form and the coordinator app ----
+const REQ_PREFIX = 'VR1.';
+function codeHash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+function encodeRequest(obj) {
+  const bytes = new TextEncoder().encode(JSON.stringify(obj)); let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  const b64 = btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return REQ_PREFIX + b64 + '.' + codeHash(b64);
+}
+function decodeRequest(code) {
+  const m = String(code).trim().match(/^VR1\.([A-Za-z0-9_-]+)\.([a-z0-9]{1,8})$/);
+  if (!m) throw new Error('format');
+  if (codeHash(m[1]) !== m[2]) throw new Error('checksum');
+  const b64 = m[1].replace(/-/g, '+').replace(/_/g, '/'), bin = atob(b64 + '==='.slice((b64.length + 3) % 4));
+  const bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const o = JSON.parse(new TextDecoder().decode(bytes));
+  if (!o || o.v !== 1) throw new Error('version');
+  return o;
+}
+function findCodes(text) { return String(text).match(/VR1\.[A-Za-z0-9_-]+\.[a-z0-9]{1,8}/g) || []; }
+// normalise untrusted request content
+function cleanRequest(o) {
+  const str = (v, n) => String(v ?? '').slice(0, n);
+  const date = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v) : null;
+  const rows = a => Array.isArray(a) ? a.slice(0, 12).map(r => ({c: str(r && r.c, 20), w: +(r && r.w) || 0})) : [];
+  return {
+    v: 1, rid: str(o.rid, 40), at: +o.at || 0, name: str(o.name, 80).trim(), sno: str(o.sno, 20).trim(), contact: str(o.contact, 80).trim(),
+    me: str(o.me, 20), sec: rows(o.sec), free: rows(o.free), ext: str(o.ext, 600),
+    vac: Array.isArray(o.vac) ? o.vac.map(date).filter(Boolean).slice(0, 3) : [],
+    fixed: Array.isArray(o.fixed) ? o.fixed.slice(0, 6).map(r => ({c: str(r && r.c, 20), d: date(r && r.d)})).filter(r => r.c && r.d) : [],
+    sh: {dows: (o.sh && Array.isArray(o.sh.dows) ? o.sh.dows : []).map(Number).filter(n => n >= 0 && n <= 6).slice(0, 7),
+      dates: (o.sh && Array.isArray(o.sh.dates) ? o.sh.dates : []).map(date).filter(Boolean).slice(0, 40), why: str(o.sh && o.sh.why, 300)},
+    notes: str(o.notes, 1000),
+    secBk: o.secBk && o.secBk.c ? {c: str(o.secBk.c, 20), w: +o.secBk.w || 0} : null, freeBk: o.freeBk && o.freeBk.c ? {c: str(o.freeBk.c, 20), w: +o.freeBk.w || 0} : null,
+    skills: !!o.skills, skillsDrop: Array.isArray(o.skillsDrop) ? o.skillsDrop.slice(0, 6).map(x => str(x, 20)) : [], tech: !!o.tech, early: str(o.early, 400),
+qa: (() => { const q = o.qa && typeof o.qa === 'object' ? o.qa : {}, r = {}; [['group', 60], ['city', 60], ['scholar', 10], ['split', 10], ['car', 120], ['rent', 120], ['social', 400], ['consent', 600]].forEach(([k, n]) => { const v = str(q[k], n).trim(); if (v) r[k] = v; }); return r; })(),
+  };
+}
+// change requests submitted during the year
+const CHG_TYPES = {shift: 'אי-זמינות לתורנויות', shiftmove: 'הזזת תורנות', vac: 'הזזת החופשה', fixed: 'בלוק בתאריך קבוע', swap: 'החלפת קורס בחירה', other: 'בקשה אחרת'};
+function cleanChange(o) {
+  const str = (v, n) => String(v ?? '').slice(0, n);
+  const date = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v) : null;
+  const type = CHG_TYPES[o.type] ? o.type : 'other', d = o.data || {};
+  const data = type === 'shift' ? {dates: (Array.isArray(d.dates) ? d.dates : []).map(date).filter(Boolean).slice(0, 40), dows: (Array.isArray(d.dows) ? d.dows : []).map(Number).filter(n => n >= 0 && n <= 6)}
+    : type === 'shiftmove' ? {from: date(d.from), to: date(d.to)}
+    : type === 'vac' ? {d: date(d.d)}
+    : type === 'fixed' ? {c: str(d.c, 20), d: date(d.d)}
+    : type === 'swap' ? {slot: Math.max(0, Math.min(40, +d.slot || 0)), w: Math.max(0, Math.min(80, +d.w || 0)), from: str(d.from, 20), to: str(d.to, 20)}
+    : {};
+  return {v: 1, k: 'chg', rid: str(o.rid, 40), at: +o.at || 0, sid: str(o.sid, 40), name: str(o.name, 80).trim(), sno: str(o.sno, 20).trim(), ver: +o.ver || 0, type, data, why: str(o.why, 800)};
+}
+function describeChange(r, fmt) {
+  const f = fmt || (x => x), d = r.data;
+  const nm = k => (typeof C !== 'undefined' && C[k]) ? C[k].n : k;
+  const DW = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  if (r.type === 'shift') return [d.dows.length ? 'בימי ' + d.dows.map(x => DW[x]).join(', ') : '', d.dates.length ? 'בתאריכים ' + d.dates.map(f).join(', ') : ''].filter(Boolean).join('; ') || 'לא צוינו תאריכים';
+  if (r.type === 'shiftmove') return `תורנות ב-${d.from ? f(d.from) : '?'}${d.to ? ` להעביר ל-${f(d.to)}` : ' להעביר לתאריך אחר'}`;
+  if (r.type === 'vac') return `חופשה שתתחיל בסביבות ${d.d ? f(d.d) : '?'}`;
+  if (r.type === 'fixed') return `${nm(d.c)} החל מ-${d.d ? f(d.d) : '?'}`;
+  if (r.type === 'swap') return `בבלוק ${d.slot + 1}${d.w % 2 ? ' (שבוע ב׳)' : ''}: ${nm(d.to)} במקום ${nm(d.from)}`;
+  return '';
+}
+// ---- personal codes and encrypted publication ----
+const CODE_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function newPersonalCode() { const a = new Uint8Array(10); crypto.getRandomValues(a); let s = ''; a.forEach(b => s += CODE_ABC[b % 32]); return s.slice(0, 5) + '-' + s.slice(5); }
+const normCode = c => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const b64e = u8 => { let s = ''; for (let i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); };
+const b64d = s => Uint8Array.from(atob(s), ch => ch.charCodeAt(0));
+async function codeMaterial(code, saltB64, iters) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(normCode(code)), 'PBKDF2', false, ['deriveBits']);
+  const bits = new Uint8Array(await crypto.subtle.deriveBits({name: 'PBKDF2', salt: b64d(saltB64), iterations: iters, hash: 'SHA-256'}, base, 384));
+  const key = await crypto.subtle.importKey('raw', bits.slice(0, 32), 'AES-GCM', false, ['encrypt', 'decrypt']);
+  return {key, id: [...bits.slice(32, 40)].map(b => b.toString(16).padStart(2, '0')).join('')};
+}
+async function sealEntry(code, salt, iters, obj) {
+  const {key, id} = await codeMaterial(code, salt, iters), iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({name: 'AES-GCM', iv}, key, new TextEncoder().encode(JSON.stringify(obj))));
+  return {i: id, v: b64e(iv), d: b64e(ct)};
+}
+async function openEntry(code, bundle) {
+  const {key, id} = await codeMaterial(code, bundle.salt, bundle.it), e = bundle.entries.find(x => x.i === id);
+  if (!e) return null;
+  const pt = await crypto.subtle.decrypt({name: 'AES-GCM', iv: b64d(e.v)}, key, b64d(e.d));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function validBundle(o) {
+  return o && o.kind === 'vrpub' && Array.isArray(o.entries) && typeof o.salt === 'string' && +o.it >= 10000 && +o.it <= 1000000 && o.year && +o.year.slots > 0
+    && o.entries.every(e => e && typeof e.i === 'string' && typeof e.v === 'string' && typeof e.d === 'string');
+}
+const PBKDF2_IT = 60000;
+// ================= Student portal =================
+const PORTAL_TITLE = 'פורטל סטודנטים – שנה ד׳ ברפואה וטרינרית';
+const DOW = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const LS_CODE = 'vet-portal-code', LS_SEEN = 'vet-portal-seen', DRAFT_KEY = 'vet-rotation-request-draft';
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} };
+function readPub() { try { const el = document.getElementById('pubdata'); const o = el ? JSON.parse(el.textContent) : null; return validBundle(o) ? o : null; } catch (e) { return null; } }
+const PUB = readPub();
+const todayIso = isoOf(new Date());
+let tab = PUB ? 'mine' : 'pref', me = null, loginErr = '', busy = false;
+let canEdit = false, artifactNs = null, downloads = null, adminOpen = false, adminBundle = null, adminMsg = '';
+
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 3800); }
+function yStart() { const v = PUB && PUB.year.start; if (!/^\d{4}-\d{2}-\d{2}$/.test(v || '')) return null; const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d); }
+function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+const fmtD = d => `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+const fmtDY = d => `${fmtD(d)}.${String(d.getFullYear()).slice(2)}`;
+function slotRange(sl) { const s = yStart(); if (!s) return ''; const a = addDays(s, sl * 14); return `${fmtD(a)}–${fmtD(addDays(a, 13))}`; }
+function curSlot() { const s = yStart(); if (!s) return -1; const di = dayIndex(todayIso, s); return di < 0 ? -1 : Math.floor(di / 14); }
+async function copyText(text, box) {
+  try { await navigator.clipboard.writeText(text); toast('הועתק.'); return; } catch (e) {}
+  try { if (box) { box.focus(); box.select(); if (document.execCommand('copy')) { toast('הועתק.'); return; } } } catch (e) {}
+  if (box) { box.focus(); box.select(); } toast('סמנו והעתיקו ידנית.');
+}
+async function saveTxt(name, text) { if (!downloads) return; try { await downloads.save({filename: name, data: text}); } catch (e) { if (!e || e.code !== 'declined') toast('לא ניתן לשמור קובץ כאן – העתיקו את הקוד.'); } }
+
+// ---------- login ----------
+async function login(code, remember) {
+  if (!PUB) return;
+  busy = true; loginErr = ''; render();
+  try {
+    const o = await openEntry(code, PUB);
+    if (!o) { loginErr = 'הקוד לא נמצא בלו״ז המפורסם. בדקו שהעתקתם אותו במלואו.'; }
+    else { me = o; if (remember) lsSet(LS_CODE, normCode(code)); }
+  } catch (e) { loginErr = 'לא ניתן לפתוח את הלו״ז בדפדפן זה.'; }
+  busy = false; render();
+}
+function logout() { me = null; lsSet(LS_CODE, null); render(); }
+function loginCard(why) {
+  return `<section class="card"><h2>כניסה עם הקוד האישי</h2><p class="sub">${why}</p>
+    <label class="field"><span>קוד אישי (נשלח אליכם מרכז/ת השיבוץ)</span><input type="text" id="codeIn" autocomplete="off" autocapitalize="characters" placeholder="XXXXX-XXXXX" style="direction:ltr;text-align:center;letter-spacing:.12em;font-size:18px"></label>
+    <label class="inline-check"><input type="checkbox" id="remember" checked> לזכור אותי במכשיר הזה</label>
+    ${loginErr ? `<p class="err">${esc(loginErr)}</p>` : ''}
+    <div class="row-btns" style="margin-top:10px"><button class="btn primary" data-act="login" ${busy ? 'disabled' : ''}>${busy ? 'פותח…' : 'כניסה'}</button></div></section>`;
+}
+
+// ---------- my schedule ----------
+function unitsOf(rows) {
+  const u = [];
+  for (let sl = 0; sl < rows.length / 2; sl++) {
+    const a = rows[2 * sl], b = rows[2 * sl + 1];
+    if (a === b) u.push({...parseCell(a), slot: sl, w: 2 * sl, len: 2}); else { u.push({...parseCell(a), slot: sl, w: 2 * sl, len: 1}); u.push({...parseCell(b), slot: sl, w: 2 * sl + 1, len: 1}); }
+  }
+  return u;
+}
+function mineHtml() {
+  if (!PUB) return `<section class="card"><h2>הלו״ז טרם פורסם</h2><p class="sub">כשהשיבוץ יפורסם, תוכלו לראות כאן את הבלוקים והתורנויות שלכם עם הקוד האישי. בינתיים אפשר למלא את טופס ההעדפות.</p><button class="btn" data-act="tab" data-v="pref">לטופס ההעדפות</button></section>`;
+  if (!me) return loginCard('הלו״ז האישי מוצפן, ורק מי שמחזיק בקוד יכול לראות אותו.');
+  const slots = PUB.year.slots, cs = curSlot(), st = yStart();
+  const seenKey = LS_SEEN + ':' + me.sid, seen = +lsGet(seenKey) || 0;
+  const changedSlots = new Set((me.ch && me.ch.slots) || []);
+  const fresh = me.ch && seen < PUB.ver && (changedSlots.size || me.ch.shifts);
+  if (seen < PUB.ver) setTimeout(() => lsSet(seenKey, String(PUB.ver)), 0);
+  const cellHtml = (cell, extra) => { const p = parseCell(cell), c = C[p.c]; return `<div class="chip cat-${p.cat}">${esc(p.c === 'VAC' ? 'חופשה' : c ? c.n : p.c)}${extra}${c ? `<small>${esc(c.code)}, ${CATS[p.cat]}</small>` : ''}</div>`; };
+  const now = cs >= 0 && cs < slots ? me.rows[2 * cs] : null;
+  const nxt = cs + 1 < slots ? me.rows[2 * Math.max(0, cs + 1)] : null;
+  const futureSh = (me.shifts || []).filter(x => x.d >= todayIso);
+  const summary = `<div class="now">
+    ${now ? `<div><span class="lbl">עכשיו</span><b>${esc(label(parseCell(now).c))}</b><small>${slotRange(cs)}</small></div>` : ''}
+    ${nxt && cs >= -1 ? `<div><span class="lbl">הבלוק הבא</span><b>${esc(label(parseCell(nxt).c))}</b><small>${slotRange(Math.max(0, cs + 1))}</small></div>` : ''}
+    ${futureSh[0] ? `<div><span class="lbl">התורנות הבאה</span><b>${fmtIso(futureSh[0].d)}</b><small>יום ${DOW[new Date(futureSh[0].d + 'T12:00:00').getDay()]}, ${SHIFT_T[futureSh[0].t]}</small></div>` : ''}</div>`;
+  const tl = Array.from({length: slots}, (_, sl) => {
+    const a = me.rows[2 * sl], b = me.rows[2 * sl + 1];
+    const what = a === b ? cellHtml(a, '') : cellHtml(a, ' (שבוע א׳)') + cellHtml(b, ' (שבוע ב׳)');
+    return `<li class="${sl < cs ? 'past' : sl === cs ? 'current' : ''}"><div class="when"><b>בלוק ${sl + 1}</b>${slotRange(sl)}${changedSlots.has(sl) ? '<span class="upd">עודכן</span>' : ''}</div><div class="what">${what}</div></li>`;
+  }).join('');
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const appr = unitsOf(me.rows).filter(u => { const a = C[u.c] && C[u.c].appr; return a && (!a.only1 || u.len === 1); }).map(u => {
+    const a = C[u.c].appr, d = st ? addDays(st, u.w * 7) : null;
+    let when = a.d30 ? '30 יום לפני הבלוק' : 'לפני תחילת הבלוק';
+    if (d && a.d30) { const dl = addDays(d, -30), days = Math.round((dl - today) / 864e5); when = `עד ${fmtDY(dl)}${days < 0 ? ' (המועד חלף)' : days <= 14 ? ` (עוד ${days} ימים)` : ''}`; }
+    else if (d) when = `לפני ${fmtDY(d)}`;
+    return `<li><b>${esc(C[u.c].n)}, בלוק ${u.slot + 1}:</b> ${esc(a.text)}, ${when}${a.form ? `. בסיום: ${esc(a.form)}` : ''}</li>`;
+  }).join('');
+  const cnt = {er: 0, dept: 0}; (me.shifts || []).forEach(x => cnt[x.t]++);
+  const sh = (me.shifts || []).map(x => { const dt = new Date(x.d + 'T12:00:00'); return `<li class="${x.d < todayIso ? 'past' : ''}"><b>${fmtIso(x.d)}</b> יום ${DOW[dt.getDay()]}<span class="pill ${x.t}">${SHIFT_T[x.t]}</span></li>`; }).join('');
+  return `${fresh ? `<div class="notice"><strong>הלו״ז שלך עודכן</strong>${changedSlots.size ? `שינויים בבלוקים ${[...changedSlots].map(x => x + 1).join(', ')}` : ''}${changedSlots.size && me.ch.shifts ? ' ו' : ''}${me.ch.shifts ? 'שינויים בתורנויות' : ''}.</div>` : ''}
+  <section class="card"><div class="me-head"><div><h2>${esc(me.name)}</h2><p class="sub" style="margin:0">גרסה ${PUB.ver}, פורסמה ${fmtDY(new Date(PUB.pub))}</p></div><button class="btn sm" data-act="logout">יציאה</button></div>${summary}
+    <div class="row-btns" style="margin-top:12px"><button class="btn" data-act="tab" data-v="change">בקשת שינוי או אילוץ חדש</button></div></section>
+  ${(me.early || []).length ? `<section class="card"><h2>בלוקים מוקדמים</h2><ul class="tl">${me.early.map(e => `<li><div class="when"><b>לפני השנה</b>${e.from ? 'מ-' + fmtIso(e.from) : ''}</div><div class="what"><div class="chip cat-${esc(e.cat)}">${esc(fullName(e.c))}<small>${+e.w === 1 ? 'שבוע' : 'שבועיים'}, ${CATS[e.cat] || ''}</small></div></div></li>`).join('')}</ul></section>` : ''}
+  <section class="card"><h2>הבלוקים שלי</h2><ul class="tl">${tl}</ul></section>
+  ${(me.cases || []).length ? `<section class="card"><h2>הצגות המקרה שלי</h2><p class="sub">ימי שלישי בין 8:30 ל-10:00, אולם היידי. 2 מקרים משני תחומים שונים; אישור המקרה ומאמר רלוונטי עם הרופא האחראי, והמצגת הגמורה נשלחת לפחות שבועיים לפני ההצגה. 20 דקות הצגה ועוד 5–10 דקות שאלות.</p><ul class="notes">${me.cases.map(x => { const sb = addDays(new Date(x.d + 'T12:00:00'), -14); return `<li class="${x.d < todayIso ? 'past' : ''}"><b>${fmtIso(x.d)}</b> – ${esc(CASE_FIELDS[x.f] || '')}. שליחת המצגת עד ${fmtDY(sb)}</li>`; }).join('')}</ul></section>` : ''}
+  ${appr ? `<section class="card"><h2>אישורים שצריך להשיג</h2><ul class="notes">${appr}</ul></section>` : ''}
+  <section class="card"><h2>התורנויות שלי <span class="meter ${cnt.er === 10 && cnt.dept === 5 ? 'ok' : ''}">חירום ${cnt.er}/10, מחלקות ${cnt.dept}/5</span>${me.ch && me.ch.shifts ? '<span class="upd">עודכן</span>' : ''}</h2><ul class="shl">${sh || '<li>לא שובצו תורנויות</li>'}</ul></section>`;
+}
+
+// ---------- change request ----------
+let chg = {type: 'shift', dows: [], dates: [], from: '', to: '', vd: '', fc: '', fd: '', unit: '', nc: '', why: ''}, chgResult = null, chgErrors = [];
+function myChoices() { const out = []; if (me.choices.me) out.push({c: me.choices.me, w: 2, cat: 'me'}); (me.choices.sec || []).forEach(r => out.push({...r, cat: 'sec'})); (me.choices.free || []).forEach(r => out.push({...r, cat: 'free'})); return out; }
+function swapUnits() { const cs = curSlot(); return unitsOf(me.rows).filter(u => ['me', 'sec', 'free'].includes(u.cat) && u.slot > cs); }
+function changeHtml() {
+  if (!PUB) return `<section class="card"><h2>עדיין אין לו״ז מפורסם</h2><p class="sub">בקשות שינוי אפשר להגיש אחרי פרסום השיבוץ. לפני כן, מלאו את טופס ההעדפות.</p></section>`;
+  if (!me) return loginCard('כדי להגיש בקשת שינוי צריך להיכנס, כך שהבקשה תשויך אליכם ולבלוקים שלכם.');
+  const t = chg.type, cs = curSlot();
+  const radios = Object.entries(CHG_TYPES).map(([k, v]) => `<label class="radio"><input type="radio" name="ctype" value="${k}" data-f="c-type" ${t === k ? 'checked' : ''}> ${v}</label>`).join('');
+  let fields = '';
+  if (t === 'shift') fields = `<p class="sub">ימים או תאריכים שבהם אינכם יכולים לבצע תורנות מעכשיו והלאה. תורנויות שכבר נקבעו בתאריכים האלה יוזזו.</p>
+    <div class="dow">${DOW.map((d, i) => `<label><input type="checkbox" data-f="c-dow" data-i="${i}" ${chg.dows.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div>
+    <div class="chips">${chg.dates.map((d, i) => `<button data-act="c-date-del" data-i="${i}">${fmtIso(d)} ✕</button>`).join('') || '<span class="muted">לא נבחרו תאריכים</span>'}</div>
+    <div class="inline"><input type="date" id="cDateNew" min="${todayIso}"><button class="btn" data-act="c-date-add">הוספה</button></div>`;
+  else if (t === 'shiftmove') { const fut = (me.shifts || []).filter(x => x.d >= todayIso);
+    fields = `<label class="field"><span>איזו תורנות</span><select data-f="c-from"><option value="">בחירה…</option>${fut.map(x => `<option value="${x.d}" ${chg.from === x.d ? 'selected' : ''}>${fmtIso(x.d)}, יום ${DOW[new Date(x.d + 'T12:00:00').getDay()]}, ${SHIFT_T[x.t]}</option>`).join('')}</select></label>
+      <label class="field"><span>תאריך מבוקש במקומה (לא חובה)</span><input type="date" data-f="c-to" min="${todayIso}" value="${esc(chg.to)}"></label>`; }
+  else if (t === 'vac') fields = `<label class="field"><span>מתי הייתם רוצים שהחופשה תתחיל</span><input type="date" data-f="c-vd" min="${todayIso}" value="${esc(chg.vd)}"></label><p class="sub">החופשה היא בלוק של שבועיים לפי מבנה הבלוקים. הזזה שלה מזיזה בלוקים אחרים שלכם.</p>`;
+  else if (t === 'fixed') fields = `<label class="field"><span>קורס מהבחירות שלכם</span><select data-f="c-fc"><option value="">בחירה…</option>${myChoices().filter(x => +x.w === 2).map(x => `<option value="${x.c}" ${chg.fc === x.c ? 'selected' : ''}>${esc(C[x.c] ? C[x.c].n : x.c)}</option>`).join('')}</select></label>
+    <label class="field"><span>תאריך התחלה</span><input type="date" data-f="c-fd" min="${todayIso}" value="${esc(chg.fd)}"></label>`;
+  else if (t === 'swap') {
+    const units = swapUnits(), sel = units.find(u => `${u.slot}:${u.w}` === chg.unit);
+    const allowed = sel ? (sel.cat === 'me' ? L3 : ALLOWED[sel.cat]).filter(k => C[k].len.includes(sel.len) && k !== sel.c && !C[k].cancelled) : [];
+    fields = `<label class="field"><span>איזה בלוק בחירה להחליף</span><select data-f="c-unit"><option value="">בחירה…</option>${units.map(u => `<option value="${u.slot}:${u.w}" ${chg.unit === `${u.slot}:${u.w}` ? 'selected' : ''}>בלוק ${u.slot + 1} (${slotRange(u.slot)})${u.len === 1 ? (u.w % 2 ? ', שבוע ב׳' : ', שבוע א׳') : ''}: ${esc(C[u.c] ? C[u.c].n : u.c)}</option>`).join('')}</select></label>
+      ${sel ? `<label class="field"><span>הקורס המבוקש במקומו (${sel.len === 1 ? 'שבוע' : 'שבועיים'}, ${CATS[sel.cat]})</span><select data-f="c-nc"><option value="">בחירה…</option>${allowed.map(k => `<option value="${k}" ${chg.nc === k ? 'selected' : ''}>${esc(C[k].n)}</option>`).join('')}</select></label>` : ''}`;
+  }
+  else fields = `<p class="sub">תארו את הבקשה, למשל היעדרות מתוכננת או החלפה עם סטודנט/ית אחר/ת.</p>`;
+  return `${chgResult ? `<div class="result" id="result"><h2>קוד הבקשה מוכן</h2><p class="muted" style="margin:0">העתיקו את הקוד ושלחו לרכז/ת השיבוץ. אחרי אישור, הלו״ז המעודכן יופיע כאן בפרסום הבא.</p>
+      <textarea id="chgBox" readonly>${esc(chgResult)}</textarea>
+      <div class="row-btns"><button class="btn primary" data-act="c-copy">העתקת הקוד</button>${downloads ? '<button class="btn" data-act="c-download">שמירה כקובץ</button>' : ''}<button class="btn" data-act="c-new">בקשה חדשה</button></div></div>` : ''}
+    ${chgErrors.length ? `<div class="errors"><strong>צריך להשלים</strong><ul>${chgErrors.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div>` : ''}
+    <section class="card"><h2>בקשת שינוי או אילוץ חדש</h2><p class="sub">${esc(me.name)}, הבקשה תיבדק מול כל כללי התכנית והלוחות של שאר הסטודנטים. אין הבטחה לאישור.</p>
+      <div class="radios">${radios}</div></section>
+    <section class="card"><h2>${CHG_TYPES[t]}</h2>${fields}
+      <label class="field" style="margin-top:12px"><span>${t === 'other' ? 'פירוט הבקשה' : 'סיבה (לא חובה)'}</span><textarea data-f="c-why" maxlength="800">${esc(chg.why)}</textarea></label>
+      <div class="row-btns"><button class="btn primary" data-act="c-make">הפקת קוד בקשה</button></div></section>`;
+}
+function checkChange() {
+  const e = [], t = chg.type;
+  if (t === 'shift' && !chg.dows.length && !chg.dates.length) e.push('סמנו לפחות יום או תאריך');
+  if (t === 'shiftmove' && !chg.from) e.push('בחרו את התורנות להזזה');
+  if (t === 'vac' && !chg.vd) e.push('בחרו תאריך');
+  if (t === 'fixed' && (!chg.fc || !chg.fd)) e.push('בחרו קורס ותאריך');
+  if (t === 'swap' && (!chg.unit || !chg.nc)) e.push('בחרו את הבלוק ואת הקורס החלופי');
+  if (t === 'other' && !chg.why.trim()) e.push('פרטו את הבקשה');
+  return e;
+}
+function buildChange() {
+  const t = chg.type, [sl, w] = (chg.unit || '0:0').split(':').map(Number);
+  const u = t === 'swap' ? swapUnits().find(x => x.slot === sl && x.w === w) : null;
+  const data = t === 'shift' ? {dows: chg.dows, dates: chg.dates} : t === 'shiftmove' ? {from: chg.from, to: chg.to} : t === 'vac' ? {d: chg.vd} : t === 'fixed' ? {c: chg.fc, d: chg.fd} : t === 'swap' ? {slot: sl, w, from: u ? u.c : '', to: chg.nc} : {};
+  return cleanChange({rid: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), at: Date.now(), sid: me.sid, name: me.name, sno: me.sno || '', ver: PUB.ver, type: t, data, why: chg.why});
+}
+
+// ---------- preferences form (start of year) ----------
+const blank = () => ({name: '', sno: '', contact: '', me: '', sec: [], free: [], ext: '', vac: ['', '', ''], fixed: [], sh: {dows: [], dates: [], why: ''}, notes: '', secBk: null, freeBk: null, skills: false, skillsDrop: [], tech: false, early: '', qa: {}});
+let f = blank(), result = null, errors = [];
+try { const d = lsGet(DRAFT_KEY); if (d) f = {...blank(), ...JSON.parse(d)}; } catch (e) {}
+let saveT;
+function saveDraft() { clearTimeout(saveT); saveT = setTimeout(() => lsSet(DRAFT_KEY, JSON.stringify(f)), 400); }
+function courseOptions(cat, cur) {
+  const groups = cat === 'sec' ? [['L3', 'רשימת בחירת חובה'], ['L4', 'רשימת בחירה משנית']] : [['L3', 'רשימת בחירת חובה'], ['L4', 'רשימת בחירה משנית'], ['L5', 'בחירה מורחבת וחופשית']];
+  return `<option value="">בחירת קורס…</option>` + groups.map(([l, t]) => `<optgroup label="${t}">${COURSES.filter(c => c.list === l).map(c => `<option value="${c.k}" ${c.k === cur ? 'selected' : ''} ${c.cancelled ? 'disabled' : ''}>${esc(c.n)}${c.cancelled ? ` – לא מתקיים ב${YEAR}` : ''}</option>`).join('')}</optgroup>`).join('');
+}
+function rowsBlock(cat, req) {
+  const rows = f[cat], sum = weeksOf(rows);
+  return `<div style="margin-bottom:10px"><span class="meter ${sum === req ? 'ok' : sum > req ? 'bad' : ''}">${sum} מתוך ${req} שבועות</span></div>
+    ${rows.map((r, i) => { const c = C[r.c], lens = c ? c.len : [1, 2];
+      return `<div class="pick-row"><select data-f="rowc" data-cat="${cat}" data-i="${i}" aria-label="קורס">${courseOptions(cat, r.c)}</select>
+      <select data-f="roww" data-cat="${cat}" data-i="${i}" aria-label="אורך">${lens.map(l => `<option value="${l}" ${+r.w === l ? 'selected' : ''}>${l === 1 ? 'שבוע' : 'שבועיים'}</option>`).join('')}</select>
+      <button class="icon-btn" data-act="row-del" data-cat="${cat}" data-i="${i}" aria-label="הסרה">✕</button></div>`; }).join('')}
+    <button class="btn ghost" data-act="row-add" data-cat="${cat}" ${sum >= req ? 'disabled' : ''}>הוספת קורס</button>`;
+}
+function chosenCourses() { return [...new Set([f.me, ...f.sec.map(r => r.c), ...f.free.map(r => r.c)].filter(k => C[k]))]; }
+function bkField(cat, lbl) {
+  const key = cat === 'sec' ? 'secBk' : 'freeBk', b = f[key], c = b && C[b.c], list = cat === 'sec' ? ALLOWED.sec : ALLOWED.free;
+  return `<label class="field"><span>${lbl}</span><div class="pick-row" style="margin:0"><select data-f="bk-c" data-cat="${cat}"><option value="">בחירה…</option>${list.map(k => `<option value="${k}" ${b && b.c === k ? 'selected' : ''}>${esc(C[k].n)}</option>`).join('')}</select>
+    <select data-f="bk-w" data-cat="${cat}" ${c ? '' : 'disabled'}>${(c ? c.len : [1, 2]).map(l => `<option value="${l}" ${b && +b.w === l ? 'selected' : ''}>${l === 1 ? 'שבוע' : 'שבועיים'}</option>`).join('')}</select><span></span></div></label>`;
+}
+const QA_CAR = 'יש ברשותי רכב בו אני מתכנן/ת לנסוע לבלוקים', QA_NOCAR = 'אין ברשותי רכב/רישיון נהיגה/איני יכול/ה לנהוג';
+const QA_RENT = 'יש לי רישיון נהיגה ואני מוכן/ה ויכול/ה לנהוג במהלך הבלוקים בהם מושכר רכב', QA_NORENT = 'אין לי רישיון נהיגה/אני לא יכול/ה או רוצה לנהוג במהלך הבלוקים בהם מושכר רכב';
+const qaOpts = (k, list) => `<option value="">בחירה…</option>` + list.map(v => `<option value="${esc(v)}" ${(f.qa || {})[k] === v ? 'selected' : ''}>${esc(v)}</option>`).join('');
+const qaYn = k => qaOpts(k, ['כן', 'לא']);
+function prefHtml() {
+  const chosen = chosenCourses(), ext = chosen.filter(k => C[k].ext);
+  const notes = chosen.map(k => C[k]).filter(c => c.appr || c.note).map(c => `<li><b>${esc(c.n)}:</b> ${esc([c.appr && c.appr.text + (c.appr.only1 ? ' (לבלוק של שבוע)' : '') + (c.appr.d30 ? ', לפחות 30 יום לפני הבלוק' : ''), c.appr && c.appr.form && 'בסיום: ' + c.appr.form, c.note].filter(Boolean).join('; '))}</li>`).join('');
+  return `
+  ${result ? `<div class="result" id="result"><h2>קוד הבקשה מוכן</h2>
+    <p class="muted" style="margin:0">העתיקו את הקוד ושלחו אותו לרכז/ת השיבוץ (בוואטסאפ או במייל). הבקשה תיבדק ותאושר או תוחזר לתיקון.</p>
+    <textarea id="codeBox" readonly aria-label="קוד הבקשה">${esc(result)}</textarea>
+    <div class="row-btns"><button class="btn primary" data-act="copy">העתקת הקוד</button>${downloads ? '<button class="btn" data-act="download">שמירה כקובץ</button>' : ''}<button class="btn" data-act="back">חזרה לעריכה</button></div>
+    <p class="muted">שמרו את הקוד. אם הבקשה תוחזר לתיקון, אפשר לטעון אותו כאן, לתקן ולהפיק קוד חדש.</p></div>` : ''}
+  ${errors.length ? `<div class="errors"><strong>צריך להשלים לפני הפקת הקוד</strong><ul>${errors.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div>` : ''}
+  <p class="sub" style="margin:0 0 12px">ממלאים פעם אחת לפני השיבוץ. שינויים במהלך השנה מגישים דרך "בקשת שינוי".</p>
+  <section class="card"><h2><span class="step">1</span>פרטים</h2>
+    <div class="grid2">
+      <label class="field"><span>שם מלא <b>*</b></span><input type="text" data-f="name" value="${esc(f.name)}" maxlength="80" autocomplete="name"></label>
+      <label class="field"><span>מספר סטודנט</span><input type="text" data-f="sno" value="${esc(f.sno)}" maxlength="20" inputmode="numeric"></label>
+    </div>
+    <label class="field"><span>טלפון או מייל לחזרה</span><input type="text" data-f="contact" value="${esc(f.contact)}" maxlength="80"></label>
+  </section>
+  <section class="card"><h2><span class="step">1א</span>פרטים נוספים</h2><p class="sub">אותם פרטים שנשאלו בשאלון הבלוקים. הם עוזרים לרכז/ת לתכנן נסיעות, קבוצות ומלגות.</p>
+<div class="grid2">
+<label class="field"><span>מי אחראי/ת הקבוצה שלכם?</span><input type="text" data-f="qa" data-q="group" value="${esc(f.qa.group || '')}" maxlength="60"></label>
+<label class="field"><span>עיר מגורים במהלך שנה ד׳</span><input type="text" data-f="qa" data-q="city" value="${esc(f.qa.city || '')}" maxlength="60" autocomplete="address-level2"></label>
+<label class="field"><span>האם בכוונתכם להגיש מועמדות למלגת אסופיים?</span><select data-f="qa" data-q="scholar">${qaYn('scholar')}</select></label>
+<label class="field"><span>האם אתם מפצלים את שנה ד׳ וקיבלתם לכך אישור?</span><select data-f="qa" data-q="split">${qaYn('split')}</select></label>
+<label class="field"><span>נהיגה ברכב פרטי</span><select data-f="qa" data-q="car">${qaOpts('car', [QA_CAR, QA_NOCAR])}</select></label>
+<label class="field"><span>נהיגה ברכב שכור</span><select data-f="qa" data-q="rent">${qaOpts('rent', [QA_RENT, QA_NORENT])}</select></label>
+</div></section>
+<section class="card"><h2><span class="step">2</span>בחירת חובה</h2><p class="sub">בלוק אחד של שבועיים מהרשימה.</p>
+    <select data-f="me" aria-label="בחירת חובה"><option value="">בחירה…</option>${L3.map(k => `<option value="${k}" ${f.me === k ? 'selected' : ''}>${esc(C[k].n)}</option>`).join('')}</select>
+  </section>
+  <section class="card"><h2><span class="step">3</span>בחירה משנית</h2><p class="sub">4 שבועות בדיוק מטבלה 3 (אפשר גם מטבלה 2). קרדיולוגיה מתקיימת רק בבלוק המשולב אונקו/קרדיו/טריו; נוירולוגיה ודרמטולוגיה – לפי האורכים ברשימה.</p>${rowsBlock('sec', REQ_SEC)}</section>
+  <section class="card"><h2><span class="step">4</span>בחירה חופשית</h2><p class="sub">${REQ_FREE} שבועות בדיוק מטבלה 4 (אפשר גם מטבלאות 2 ו-3), כולל בלוקים חיצוניים ומרפאה פרטית.</p>${rowsBlock('free', REQ_FREE)}
+    ${notes ? `<ul class="notes">${notes}</ul>` : ''}
+    ${ext.length ? `<label class="field" style="margin-top:12px"><span>פרטי הבלוק החיצוני: מוסד, רופא/ה מפקח/ת, תאריכים ידועים</span><textarea data-f="ext" maxlength="600">${esc(f.ext)}</textarea></label>` : ''}
+  </section>
+  <section class="card"><h2><span class="step">4א</span>בלוקי גיבוי, מיומנויות קליניות וניסיון</h2>
+    <p class="sub">אם יהיו יותר מבקשים ממקומות, תיערך הגרלה, ומי שלא יזכה יעבור לבלוק הגיבוי. הגיבוי חייב להיות שונה מהבחירות שלכם.</p>
+    ${bkField('sec', 'בלוק גיבוי לבחירה משנית')}${bkField('free', 'בלוק גיבוי לבחירה חופשית')}
+    <label class="radio" style="margin-top:8px"><input type="checkbox" data-f="skills" ${f.skills ? 'checked' : ''}> מעוניין/ת בבלוק מיומנויות קליניות של חיות קטנות (שבועיים, נפתח רק מ-35 נרשמים; שבוע ראשון בבלוקים 1–6 או כבלוק מוקדם)</label>
+    ${f.skills ? `<p class="sub" style="margin:6px 0">אם הבלוק ייפתח – על אילו בלוקים מהבחירה החופשית תוותרו (בסך הכול שבועיים)?</p><div class="dow">${f.free.filter(r => C[r.c]).map(r => `<label><input type="checkbox" data-f="skdrop" data-c="${r.c}" ${f.skillsDrop.includes(r.c) ? 'checked' : ''}> ${esc(C[r.c].s || C[r.c].n)} (${+r.w === 1 ? 'שבוע' : 'שבועיים'})</label>`).join('') || '<span class="muted">בחרו קודם בלוקים בבחירה החופשית</span>'}</div>` : ''}
+    <label class="radio" style="margin-top:8px"><input type="checkbox" data-f="tech" ${f.tech ? 'checked' : ''}> יש לי ניסיון בטכנאות וטרינרית (פתיחת וריד, דף טיפולים וכדומה)</label>
+    ${(() => { const w = choiceWarnings(f).filter(x => !/^לא נבחר בלוק גיבוי/.test(x)); return w.length ? `<ul class="notes">${w.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''; })()}
+  </section>
+  <section class="card"><h2><span class="step">4ב</span>בלוקים מוקדמים</h2><p class="sub">אם ברצונכם לעשות בלוק לפני תחילת השנה (אוגוסט–אוקטובר 2026), כתבו איזה בלוק ובאילו תאריכים. כל שבוע מוקדם מזכה בשבוע חופש נוסף בשנה.</p>
+    <label class="field"><span>בלוק ותאריכים</span><textarea data-f="early" maxlength="400">${esc(f.early)}</textarea></label></section>
+  <section class="card"><h2><span class="step">5</span>חופש</h2><p class="sub">4 שבועות חופש בשנה (אפשר לפצל), ועוד שבוע חופש חובה אחרי בלוק חו״ל. כתבו מתי הייתם רוצים שהחופש יתחיל, לפי סדר עדיפות. זו העדפה ולא התחייבות.</p>
+    <div class="grid2">${[0, 1, 2].map(i => `<label class="field"><span>עדיפות ${i + 1}</span><input type="date" data-f="vac" data-i="${i}" value="${esc(f.vac[i] || '')}"></label>`).join('')}</div>
+  </section>
+  <section class="card"><h2><span class="step">6</span>בלוקים בתאריכים קבועים</h2><p class="sub">רק אם בלוק חייב להתקיים בתאריך מסוים, למשל בלוק חו״ל שכבר נקבע. בחרו קורס מהבחירות שלכם ואת תאריך ההתחלה.</p>
+    ${f.fixed.map((r, i) => `<div class="pick-row fix"><select data-f="fixc" data-i="${i}" aria-label="קורס"><option value="">בחירת קורס…</option>${chosen.map(k => `<option value="${k}" ${r.c === k ? 'selected' : ''}>${esc(C[k].n)}</option>`).join('')}</select>
+      <input type="date" data-f="fixd" data-i="${i}" value="${esc(r.d || '')}" aria-label="תאריך התחלה"><button class="icon-btn" data-act="fix-del" data-i="${i}" aria-label="הסרה">✕</button></div>`).join('')}
+    <button class="btn ghost" data-act="fix-add" ${chosen.length ? '' : 'disabled'}>הוספת בלוק בתאריך קבוע</button>
+  </section>
+  <section class="card"><h2><span class="step">7</span>אילוצי תורנויות</h2><p class="sub">15 תורנויות בשנה (10 חירום, 5 מחלקות) בסופי שבוע ובחגים. סמנו ימים או תאריכים שבהם אינכם יכולים לבצע תורנות.</p>
+    <div class="dow" role="group" aria-label="ימים שאינם אפשריים">${DOW.map((d, i) => `<label><input type="checkbox" data-f="dow" data-i="${i}" ${f.sh.dows.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div>
+    <span class="muted">תאריכים מסוימים</span>
+    <div class="chips">${f.sh.dates.map((d, i) => `<button data-act="shd-del" data-i="${i}" aria-label="הסרת ${fmtIso(d)}">${fmtIso(d)} ✕</button>`).join('') || '<span class="muted">לא נבחרו תאריכים</span>'}</div>
+    <div class="inline"><input type="date" id="shNew" aria-label="תאריך"><button class="btn" data-act="shd-add">הוספה</button></div>
+    <label class="field" style="margin-top:12px"><span>סיבה (לא חובה)</span><input type="text" data-f="why" value="${esc(f.sh.why)}" maxlength="300"></label>
+  </section>
+  <section class="card"><h2><span class="step">8</span>הערות לרכז/ת</h2>
+    <label class="field"><span>בקשות חברתיות (לא חובה), למשל סטודנטים שהייתם רוצים להיות איתם בבלוק</span><textarea data-f="qa" data-q="social" maxlength="400">${esc(f.qa.social || '')}</textarea></label>
+<label class="field"><span>בקשות אישיות והערות חשובות</span><textarea data-f="notes" maxlength="1000">${esc(f.notes)}</textarea></label>
+${ext.length ? `<label class="field"><span>קישורים לטפסי ההסכמה החתומים של הבלוקים החיצוניים (אם יש)</span><textarea data-f="qa" data-q="consent" maxlength="600" placeholder="קישור לקובץ בדרייב או הערה שהטפסים יישלחו בנפרד">${esc(f.qa.consent || '')}</textarea></label>` : ''}
+  </section>
+  <div class="row-btns" style="margin:18px 0"><button class="btn primary" data-act="make">הפקת קוד בקשה</button></div>
+  <details><summary>טעינת קוד קודם לעריכה</summary>
+    <textarea id="loadBox" style="margin-top:8px;direction:ltr;text-align:left" placeholder="VR1...."></textarea>
+    <button class="btn" data-act="load" style="margin-top:6px">טעינה</button>
+  </details>
+  <details><summary>התחלה מחדש</summary><button class="btn" data-act="reset" style="margin-top:6px">ניקוי הטופס</button></details>`;
+}
+function check() {
+  const e = [];
+  if (!f.name.trim()) e.push('חסר שם מלא');
+  e.push(...validateChoices(f));
+  if (!f.secBk || !f.secBk.c) e.push('חסר בלוק גיבוי לבחירה משנית');
+  if (!f.freeBk || !f.freeBk.c) e.push('חסר בלוק גיבוי לבחירה חופשית');
+  const chosenAll = chosenCourses();
+  [['secBk', 'משנית'], ['freeBk', 'חופשית']].forEach(([k, l]) => { if (f[k] && chosenAll.includes(f[k].c)) e.push(`בלוק הגיבוי לבחירה ה${l} כבר נמצא בין הבחירות – בחרו בלוק אחר`); });
+  if (f.skills) { const dw = f.free.filter(r => f.skillsDrop.includes(r.c)).reduce((a, r) => a + (+r.w || 0), 0); if (dw !== 2) e.push(`בלוק מיומנויות: סמנו בלוקים מהבחירה החופשית שמסתכמים בשבועיים לוויתור (כרגע ${dw})`); }
+  const chosen = chosenCourses();
+  f.fixed.forEach((r, i) => { if (!r.c || !r.d) e.push(`בלוק בתאריך קבוע ${i + 1}: חסר קורס או תאריך`); else if (!chosen.includes(r.c)) e.push(`בלוק בתאריך קבוע ${i + 1}: הקורס אינו בין הבחירות`); });
+  return e;
+}
+function build() {
+  return cleanRequest({v: 1, rid: 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), at: Date.now(), name: f.name, sno: f.sno, contact: f.contact,
+    me: f.me, sec: f.sec, free: f.free, ext: chosenCourses().some(k => C[k].ext) ? f.ext : '', vac: f.vac.filter(Boolean), fixed: f.fixed, sh: f.sh, notes: f.notes,
+    secBk: f.secBk, freeBk: f.freeBk, skills: f.skills, skillsDrop: f.skills ? f.skillsDrop.filter(k => f.free.some(r => r.c === k)) : [], tech: f.tech, early: f.early, qa: f.qa});
+}
+
+// ---------- admin: publish a bundle prepared in the coordinator app ----------
+function buildDoc(bundle) {
+  const css = document.getElementById('st').textContent, js = document.getElementById('main').textContent;
+  const data = JSON.stringify(bundle || null).replace(/</g, '\\u003c');
+  return '<!doctype html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>' + PORTAL_TITLE + '</title>\n'
+    + '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&display=swap" rel="stylesheet">\n'
+    + '<style id="st">' + css + '</style>\n</head>\n<body>\n<div id="root"></div>\n<div id="toast" class="toast" role="status" aria-live="polite"></div>\n'
+    + '<script type="application/json" id="pubdata">' + data + '</scr' + 'ipt>\n<script id="main">' + js + '</scr' + 'ipt>\n</body>\n</html>\n';
+}
+function adminHtml() {
+  const cur = PUB ? `גרסה ${PUB.ver} פורסמה ב-${fmtDY(new Date(PUB.pub))}, ${PUB.entries.length} סטודנטים.` : 'עדיין לא פורסם לו״ז.';
+  return `<section class="card"><h2>פרסום הלו״ז לסטודנטים</h2><p class="sub">${cur}</p>
+    <p class="sub">באפליקציית השיבוץ, בלשונית "פרסום", מכינים חבילת פרסום. מדביקים אותה כאן או טוענים את הקובץ, ומפרסמים. הלוחות מוצפנים, וכל סטודנט רואה רק את שלו עם הקוד האישי.</p>
+    <textarea id="bundleIn" style="direction:ltr;min-height:90px" placeholder='{"kind":"vrpub",...}'></textarea>
+    <div class="row-btns" style="margin-top:8px"><button class="btn" data-act="a-check">בדיקת החבילה</button><button class="btn" data-act="a-file">מקובץ</button></div>
+    ${adminMsg ? `<p class="${adminBundle ? 'okmsg' : 'err'}">${esc(adminMsg)}</p>` : ''}
+    ${adminBundle ? `<div class="row-btns"><button class="btn primary" data-act="a-publish">פרסום גרסה ${adminBundle.ver}</button></div>` : ''}
+    ${PUB ? `<details style="margin-top:14px"><summary>הסרת הלו״ז מהפורטל</summary><p class="sub">הפורטל יחזור למצב "טרם פורסם". טופס ההעדפות נשאר.</p><button class="btn danger" data-act="a-unpublish">הסרה</button></details>` : ''}
+    <input type="file" id="bundleFile" accept=".json,application/json,.txt" hidden></section>`;
+}
+function parseBundle(text) {
+  try { const o = JSON.parse(String(text).trim()); if (!validBundle(o)) throw new Error('bad'); return o; } catch (e) { return null; }
+}
+async function doPublish(bundle) {
+  if (!artifactNs) { toast('פרסום זמין רק בתצוגה של בעל/ת הדף ב-Claude.'); return; }
+  try { await artifactNs.publish(buildDoc(bundle)); toast('פורסם. הדף נטען מחדש.'); }
+  catch (e) {
+    const c = e && e.code;
+    if (c === 'conflict') return;
+    adminMsg = c === 'not_writer' || c === 'not_granted' || c === 'consent_required' ? 'לתצוגה הזו אין הרשאת פרסום. פתחו את הפורטל מהחשבון של בעל/ת הדף.' : c === 'too_large' ? 'החבילה גדולה מדי לפרסום.' : c === 'rate_limited' ? 'פרסמתם הרגע – נסו שוב בעוד דקה.' : 'הפרסום נכשל. נסו שוב.';
+    adminBundle = null; render();
+  }
+}
+
+// ---------- shell ----------
+function render() {
+  const tabs = [['mine', 'הלו״ז שלי'], ['change', 'בקשת שינוי'], ['pref', 'העדפות לתחילת שנה']];
+  if (canEdit || adminOpen) tabs.push(['admin', 'ניהול']);
+  const body = tab === 'mine' ? mineHtml() : tab === 'change' ? changeHtml() : tab === 'admin' ? adminHtml() : prefHtml();
+  document.getElementById('root').innerHTML = `<header><div class="wrap"><h1>פורטל סטודנטים</h1><p>שנה ד׳ ברפואה וטרינרית, תשפ״ז</p>
+    <nav class="ptabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" aria-selected="${tab === k}" data-act="tab" data-v="${k}">${t}</button>`).join('')}</nav></div></header>
+    <main class="wrap">${body}${!canEdit && !adminOpen ? '<p class="foot"><button class="linkbtn" data-act="admin-open">כניסת רכז/ת</button></p>' : ''}</main>`;
+}
+
+document.addEventListener('click', async e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const a = t.dataset.act, i = +t.dataset.i;
+  switch (a) {
+    case 'tab': tab = t.dataset.v; render(); window.scrollTo(0, 0); return;
+    case 'admin-open': adminOpen = true; tab = 'admin'; render(); return;
+    case 'login': { const code = document.getElementById('codeIn').value; if (!normCode(code)) { loginErr = 'הזינו את הקוד.'; render(); return; } login(code, document.getElementById('remember').checked); return; }
+    case 'logout': logout(); return;
+    case 'c-date-add': { const v = document.getElementById('cDateNew').value; if (!v) { toast('בחרו תאריך.'); return; } if (!chg.dates.includes(v)) chg.dates.push(v); chg.dates.sort(); break; }
+    case 'c-date-del': chg.dates.splice(i, 1); break;
+    case 'c-make': chgErrors = checkChange(); chgResult = chgErrors.length ? null : encodeRequest(buildChange()); render(); window.scrollTo(0, 0); return;
+    case 'c-copy': copyText(chgResult, document.getElementById('chgBox')); return;
+    case 'c-download': saveTxt(`bakashat-shinui-${(me && me.name || 'student').replace(/\s+/g, '-')}.txt`, chgResult); return;
+    case 'c-new': chg = {type: 'shift', dows: [], dates: [], from: '', to: '', vd: '', fc: '', fd: '', unit: '', nc: '', why: ''}; chgResult = null; chgErrors = []; break;
+    case 'a-check': { const b = parseBundle(document.getElementById('bundleIn').value); adminBundle = b; adminMsg = b ? `חבילה תקינה: גרסה ${b.ver}, ${b.entries.length} סטודנטים, הוכנה ב-${fmtDY(new Date(b.pub))}.` : 'זו לא חבילת פרסום תקינה. העתיקו אותה שוב מאפליקציית השיבוץ.'; break; }
+    case 'a-file': document.getElementById('bundleFile').click(); return;
+    case 'a-publish': if (adminBundle) doPublish(adminBundle); return;
+    case 'a-unpublish': doPublish(null); return;
+    // preferences form
+    case 'row-add': f[t.dataset.cat].push({c: '', w: 2}); break;
+    case 'row-del': f[t.dataset.cat].splice(i, 1); break;
+    case 'fix-add': f.fixed.push({c: '', d: ''}); break;
+    case 'fix-del': f.fixed.splice(i, 1); break;
+    case 'shd-add': { const v = document.getElementById('shNew').value; if (!v) { toast('בחרו תאריך.'); return; } if (!f.sh.dates.includes(v)) f.sh.dates.push(v); f.sh.dates.sort(); break; }
+    case 'shd-del': f.sh.dates.splice(i, 1); break;
+    case 'make': errors = check(); result = errors.length ? null : encodeRequest(build()); render(); window.scrollTo(0, 0); saveDraft(); return;
+    case 'copy': copyText(result, document.getElementById('codeBox')); return;
+    case 'download': saveTxt(`bakasha-${(f.name || 'student').replace(/\s+/g, '-')}.txt`, result); return;
+    case 'back': result = null; break;
+    case 'load': {
+      const code = findCodes(document.getElementById('loadBox').value)[0];
+      try { const o = decodeRequest(code || ''); if (o.k === 'chg') throw new Error('chg'); const c = cleanRequest(o); f = {...blank(), ...c, vac: [...c.vac, '', '', ''].slice(0, 3)}; result = null; errors = []; toast('הבקשה נטענה. אפשר לערוך ולהפיק קוד חדש.'); }
+      catch (err) { toast('הקוד אינו תקין או שהועתק חלקית.'); return; }
+      break;
+    }
+    case 'reset': f = blank(); result = null; errors = []; break;
+    default: return;
+  }
+  saveDraft(); render();
+});
+document.addEventListener('input', e => {
+  const t = e.target, k = t.dataset.f;
+  if (['name', 'sno', 'contact', 'ext', 'notes', 'early'].includes(k)) { f[k] = t.value; saveDraft(); }
+else if (k === 'qa') { f.qa = {...f.qa, [t.dataset.q]: t.value}; saveDraft(); }
+  else if (k === 'why') { f.sh.why = t.value; saveDraft(); }
+  else if (k === 'c-why') chg.why = t.value;
+});
+document.addEventListener('change', e => {
+  const t = e.target, k = t.dataset.f, i = +t.dataset.i;
+  if (t.id === 'bundleFile') { const file = t.files && t.files[0]; t.value = ''; if (file) file.text().then(txt => { document.getElementById('bundleIn').value = txt; const b = parseBundle(txt); adminBundle = b; adminMsg = b ? `חבילה תקינה: גרסה ${b.ver}, ${b.entries.length} סטודנטים.` : 'זו לא חבילת פרסום תקינה.'; render(); }); return; }
+  if (k && k.startsWith('c-')) {
+    if (k === 'c-type') { chg.type = t.value; chgErrors = []; chgResult = null; }
+    else if (k === 'c-dow') { const s = new Set(chg.dows); t.checked ? s.add(i) : s.delete(i); chg.dows = [...s].sort(); return; }
+    else if (k === 'c-from') chg.from = t.value;
+    else if (k === 'c-to') { chg.to = t.value; return; }
+    else if (k === 'c-vd') { chg.vd = t.value; return; }
+    else if (k === 'c-fc') chg.fc = t.value;
+    else if (k === 'c-fd') { chg.fd = t.value; return; }
+    else if (k === 'c-unit') { chg.unit = t.value; chg.nc = ''; }
+    else if (k === 'c-nc') chg.nc = t.value;
+    else return;
+    setTimeout(render, 0); return;
+  }
+  if (k === 'me') f.me = t.value;
+  else if (k === 'qa') { f.qa = {...f.qa, [t.dataset.q]: t.value}; saveDraft(); return; }
+else if (k === 'bk-c') { const key = t.dataset.cat === 'sec' ? 'secBk' : 'freeBk', c = C[t.value]; f[key] = c ? {c: t.value, w: c.len[c.len.length - 1]} : null; }
+  else if (k === 'bk-w') { const key = t.dataset.cat === 'sec' ? 'secBk' : 'freeBk'; if (f[key]) f[key].w = +t.value; }
+  else if (k === 'skills') { f.skills = t.checked; if (!f.skills) f.skillsDrop = []; }
+  else if (k === 'skdrop') { const st = new Set(f.skillsDrop); t.checked ? st.add(t.dataset.c) : st.delete(t.dataset.c); f.skillsDrop = [...st]; }
+  else if (k === 'tech') f.tech = t.checked;
+  else if (k === 'rowc') { const r = f[t.dataset.cat][i]; r.c = t.value; const c = C[r.c]; if (c && !c.len.includes(+r.w)) r.w = c.len[0]; }
+  else if (k === 'roww') f[t.dataset.cat][i].w = +t.value;
+  else if (k === 'vac') { f.vac[i] = t.value; saveDraft(); return; }
+  else if (k === 'fixc') f.fixed[i].c = t.value;
+  else if (k === 'fixd') { f.fixed[i].d = t.value; saveDraft(); return; }
+  else if (k === 'dow') { const s = new Set(f.sh.dows); t.checked ? s.add(i) : s.delete(i); f.sh.dows = [...s].sort(); saveDraft(); return; }
+  else return;
+  if (result) result = null;
+  saveDraft(); setTimeout(render, 0);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target && e.target.id === 'codeIn') { e.preventDefault(); document.querySelector('[data-act=login]').click(); } });
+
+render();
+(async () => {
+  try {
+    if (window.claude && typeof window.claude.use === 'function') {
+      const [dl, art, usr] = await Promise.all([window.claude.use('downloads').catch(() => null), window.claude.use('artifact').catch(() => null), window.claude.use('user').catch(() => null)]);
+      downloads = dl; artifactNs = art;
+      if (usr) { try { canEdit = !!(await usr.canEdit()); } catch (e) {} }
+      render();
+    }
+  } catch (e) {}
+})();
+const saved = lsGet(LS_CODE);
+if (PUB && saved) login(saved, true);
+</script>
+</body>
+</html>
