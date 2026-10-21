@@ -263,6 +263,10 @@ table.load{border-collapse:separate;border-spacing:0;font-size:11px}
 .srow .choices{display:flex;flex-wrap:wrap;gap:4px;font-size:12px}
 .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;background:var(--cbg,var(--surface-2));border-inline-start:3px solid var(--c,var(--line));white-space:nowrap}
 .err-line{font-size:12px;color:var(--alarm)}
+.selbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px}
+.selbar .inline-check{display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+.srow h3 input[type=checkbox],.selbar input[type=checkbox]{width:18px;height:18px;margin:0;flex:none;cursor:pointer;accent-color:var(--alarm)}
+.srow.sel{border-color:var(--alarm);background:color-mix(in srgb,var(--alarm-bg) 45%,var(--surface))}
 @media (max-width:720px){.srow{grid-template-columns:1fr auto}.srow .choices{grid-column:1/-1;grid-row:2}}
 
 .empty{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:32px clamp(16px,4vw,40px);max-width:680px}
@@ -1980,6 +1984,14 @@ function viewBoard(ctx) {
 
 function catTag(k, cat, w) { return `<span class="tag cat-${cat}">${esc(label(k))}${w ? ` ${w === 1 ? 'ש׳' : '2 ש׳'}` : ''}</span>`; }
 
+// multi-select on the students tab (for deleting several students at once)
+function stSel() {
+  if (!(state.stSel instanceof Set)) state.stSel = new Set();
+  const ids = new Set(state.students.map(s => s.id));
+  [...state.stSel].forEach(id => { if (!ids.has(id)) state.stSel.delete(id); });
+  return state.stSel;
+}
+function refreshStudentList() { const w = document.getElementById('slistWrap'); if (w) w.innerHTML = studentRowsHtml(); }
 function studentRowsHtml() {
   const {m} = pendingBySid(), q = normTxt(state.stQuery), f = state.stFilter, open = new Set(state.stOpen);
   const list = state.students.filter(s => {
@@ -1991,13 +2003,16 @@ function studentRowsHtml() {
     return true;
   });
   list.sort(byGroupThenName);
+  const sel = stSel();
   if (!list.length) return `<div class="empty"><h2>אין סטודנטים בתצוגה זו</h2><p>${q ? 'נסו חיפוש אחר או ' : ''}שנו את הסינון.</p></div>`;
-  return list.map(s => {
+  const shown = list.map(s => s.id), shownSel = shown.filter(id => sel.has(id)).length, hidden = sel.size - shownSel;
+  const bar = `<div class="selbar"><label class="inline-check"><input type="checkbox" data-f="st-all" ${shownSel === shown.length ? 'checked' : ''}> בחירת כל המוצגים (${shown.length})</label>${sel.size ? `<b>נבחרו ${sel.size}</b>${hidden ? `<span class="progress">(${hidden} מהם לא מוצגים בסינון הנוכחי)</span>` : ''}<span class="spacer" style="flex:1"></span><button class="btn sm" data-act="st-sel-clear">ניקוי הבחירה</button><button class="btn sm danger" data-act="st-del-sel">מחיקת ${sel.size} המסומנים</button>` : '<span class="progress">מסמנים סטודנטים כדי למחוק כמה יחד</span>'}</div>`;
+  return bar + list.map(s => {
     const errs = validateChoices(s), pend = m.get(s.id) || [];
     const ch = [s.me ? catTag(s.me, 'me') : '', ...(s.sec || []).filter(r => r.c).map(r => catTag(r.c, 'sec', +r.w)), ...(s.free || []).filter(r => r.c).map(r => catTag(r.c, 'free', +r.w))].join('');
     const note = (s.frozen ? '<span class="pill warn">לוח קפוא בהחרגה</span>' : '') + (s.lot ? `<span class="pill ${s.lot.manual && s.lot.manual.length ? 'bad' : 'mute'}">${s.lot.manual && s.lot.manual.length ? 'הגרלה: לטיפול ידני' : s.lot.repl && s.lot.repl.length ? 'הגרלה: הוחלף לגיבוי' : 'הגרלה: ללא שינוי'}</span>` : '') + (earlyWeeks(s) ? `<span class="pill mute">מוקדם ${earlyWeeks(s)} ש׳</span>` : '') + (s.qa && s.qa.group ? `<small class="progress">קבוצת ${esc(s.qa.group)}</small>` : '');
     const pendBtn = pend.length ? `<button class="pill-btn" data-act="st-toggle" data-id="${s.id}" aria-expanded="${open.has(s.id)}">${pend.length === 1 ? 'בקשה ממתינה' : pend.length + ' בקשות ממתינות'} ${open.has(s.id) ? '▴' : '▾'}</button>` : '';
-    return `<div class="srow"><div><h3><i class="dot ${errs.length && !s.frozen ? 'bad' : ''}"></i>${esc(s.name || 'ללא שם')}${s.sno ? ` <small class="progress">${esc(s.sno)}</small>` : ''} ${note}</h3>${errs.length && !s.frozen ? `<div class="err-line">${esc(errs[0])}${errs.length > 1 ? ` (+${errs.length - 1})` : ''}</div>` : ''}${pendBtn}</div>
+    return `<div class="srow${sel.has(s.id) ? ' sel' : ''}"><div><h3><input type="checkbox" data-f="st-sel" data-id="${s.id}" ${sel.has(s.id) ? 'checked' : ''} aria-label="בחירת ${esc(s.name || 'ללא שם')}"><i class="dot ${errs.length && !s.frozen ? 'bad' : ''}"></i>${esc(s.name || 'ללא שם')}${s.sno ? ` <small class="progress">${esc(s.sno)}</small>` : ''} ${note}</h3>${errs.length && !s.frozen ? `<div class="err-line">${esc(errs[0])}${errs.length > 1 ? ` (+${errs.length - 1})` : ''}</div>` : ''}${pendBtn}</div>
       <div class="choices">${ch || '<span class="progress">לא הוזנו בחירות</span>'}</div>
       <button class="btn sm" data-act="edit" data-id="${s.id}">עריכה</button>
       ${open.has(s.id) && pend.length ? `<div class="inline-reqs">${pend.map(reqCard).join('')}</div>` : ''}</div>`;
@@ -4485,6 +4500,15 @@ document.addEventListener('click', e => {
     case 'req-approve-all': armed(t, () => { const list = state.requests.filter(r => r.status === 'pending' && r.k !== 'chg' && !checkRequest(r).errors.length).sort((a, b) => (a.at || 0) - (b.at || 0)); list.forEach(r => { if (r.status === 'pending') approveRequest(r); }); toast(`אושרו ${list.length} בקשות העדפות.`); }); break;
     case 'req-student': state.reqStudent = id; state.reqFilter = 'all'; state.view = 'requests'; render(); break;
     case 'req-student-clear': state.reqStudent = null; render(); break;
+    case 'st-sel-clear': stSel().clear(); refreshStudentList(); break;
+    case 'st-del-sel': armed(t, () => {
+      const sel = stSel(), n = sel.size; if (!n) return;
+      state.students = state.students.filter(x => !sel.has(x.id));
+      state.exceptions = state.exceptions.filter(x => !sel.has(x.sid));
+      state.stOpen = state.stOpen.filter(x => !sel.has(x));
+      sel.clear(); persist('roster', 'exceptions'); render();
+      toast(n === 1 ? 'סטודנט אחד נמחק.' : `נמחקו ${n} סטודנטים.`);
+    }); break;
     case 'st-toggle': { const set = new Set(state.stOpen); set.has(id) ? set.delete(id) : set.add(id); state.stOpen = [...set]; render(); break; }
     case 'xls-import': document.getElementById('xlsFile').click(); break;
     case 'legacy-import': document.getElementById('legacyFile').click(); break;
@@ -4549,6 +4573,12 @@ document.addEventListener('change', e => {
     setCases(s0, l); return; }
   if (f === 'req-filter') { state.reqFilter = t.value; render(); return; }
   if (f === 'st-filter') { state.stFilter = t.value; render(); return; }
+  if (f === 'st-sel' || f === 'st-all') {
+    const sel = stSel();
+    if (f === 'st-sel') { if (t.checked) sel.add(t.dataset.id); else sel.delete(t.dataset.id); }
+    else document.querySelectorAll('[data-f=st-sel]').forEach(x => { if (t.checked) sel.add(x.dataset.id); else sel.delete(x.dataset.id); });
+    refreshStudentList(); return;
+  }
   if (f === 'req-match') { const r = state.requests.find(x => x.rid === t.dataset.rid); if (r) { r.match = t.value; persist('requests'); render(); } return; }
   if (f === 'blk-dow') { const s = byId(state.sheet.id); if (!s) return; const set = new Set(s.shiftBlock.dows); t.checked ? set.add(+t.dataset.i) : set.delete(+t.dataset.i); s.shiftBlock.dows = [...set].sort(); persist('roster'); render(); return; }
   if (f === 'blk-dates') { const s = byId(state.sheet.id); if (!s) return; s.shiftBlock.dates = (t.value.match(/\d{4}-\d{2}-\d{2}/g) || []).sort(); persist('roster'); renderSheet(); render(); return; }
