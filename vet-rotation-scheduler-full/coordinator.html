@@ -1449,7 +1449,7 @@ function cleanRequest(o) {
     vac: Array.isArray(o.vac) ? o.vac.map(date).filter(Boolean).slice(0, 3) : [],
     fixed: Array.isArray(o.fixed) ? o.fixed.slice(0, 6).map(r => ({c: str(r && r.c, 20), d: date(r && r.d)})).filter(r => r.c && r.d) : [],
     sh: {dows: (o.sh && Array.isArray(o.sh.dows) ? o.sh.dows : []).map(Number).filter(n => n >= 0 && n <= 6).slice(0, 7),
-      dates: (o.sh && Array.isArray(o.sh.dates) ? o.sh.dates : []).map(date).filter(Boolean).slice(0, 40), why: str(o.sh && o.sh.why, 300)},
+      dates: (o.sh && Array.isArray(o.sh.dates) ? o.sh.dates : []).map(date).filter(Boolean).slice(0, 150), why: str(o.sh && o.sh.why, 300)},
     notes: str(o.notes, 1000),
     secBk: o.secBk && o.secBk.c ? {c: str(o.secBk.c, 20), w: +o.secBk.w || 0} : null, freeBk: o.freeBk && o.freeBk.c ? {c: str(o.freeBk.c, 20), w: +o.freeBk.w || 0} : null,
     skills: !!o.skills, skillsDrop: Array.isArray(o.skillsDrop) ? o.skillsDrop.slice(0, 6).map(x => str(x, 20)) : [], tech: !!o.tech, early: str(o.early, 400),
@@ -1462,7 +1462,7 @@ function cleanChange(o) {
   const str = (v, n) => String(v ?? '').slice(0, n);
   const date = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v) : null;
   const type = CHG_TYPES[o.type] ? o.type : 'other', d = o.data || {};
-  const data = type === 'shift' ? {dates: (Array.isArray(d.dates) ? d.dates : []).map(date).filter(Boolean).slice(0, 40), dows: (Array.isArray(d.dows) ? d.dows : []).map(Number).filter(n => n >= 0 && n <= 6)}
+  const data = type === 'shift' ? {dates: (Array.isArray(d.dates) ? d.dates : []).map(date).filter(Boolean).slice(0, 150), dows: (Array.isArray(d.dows) ? d.dows : []).map(Number).filter(n => n >= 0 && n <= 6)}
     : type === 'shiftmove' ? {from: date(d.from), to: date(d.to)}
     : type === 'vac' ? {d: date(d.d)}
     : type === 'fixed' ? {c: str(d.c, 20), d: date(d.d)}
@@ -2732,8 +2732,8 @@ function sheetEdit(id) {
   ${earlySection(s)}
   <section class="grp"><h3>חופש מועדף <small>${vb * 2} שבועות חופש בשנה${earlyWeeks(s) ? ` ועוד ${earlyWeeks(s)} תמורת בלוקים מוקדמים` : ''}. סמנו בלוקים מועדפים – העדפה בלבד.</small></h3>
     <div class="slot-picks">${Array.from({length: slots}, (_, i) => `<button data-act="vac" data-slot="${i}" aria-pressed="${(s.vac || []).includes(i)}" title="${slotRange(i) || 'בלוק ' + (i + 1)}">${i + 1}</button>`).join('')}</div></section>
-  <section class="grp"><h3>אילוצי תורנויות <small>ימים ותאריכים שבהם לא ישובצו תורנויות</small></h3>
-    <div class="dow">${DOW_S.map((d, i) => `<label><input type="checkbox" data-f="blk-dow" data-i="${i}" ${s.shiftBlock.dows.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div>
+  <section class="grp"><h3>אילוצי תורנויות <small>ימים ותאריכים שבהם לא ישובצו תורנויות (רק ימי תורנות: סוף שבוע וחגים)</small></h3>
+    <div class="dow">${DOW_S.map((d, i) => (state.config.shift.days || []).includes(i) || s.shiftBlock.dows.includes(i) ? `<label><input type="checkbox" data-f="blk-dow" data-i="${i}" ${s.shiftBlock.dows.includes(i) ? 'checked' : ''}> כל יום ${DOW[i]}</label>` : '').join('')}</div>
     <label class="field"><span>תאריכים (שנה-חודש-יום, אחד בשורה)</span><textarea data-f="blk-dates" rows="3" style="padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);direction:ltr">${esc(s.shiftBlock.dates.join('\n'))}</textarea></label>
     ${s.shiftBlock.why ? `<p class="progress" style="margin:0">סיבה: ${esc(s.shiftBlock.why)}</p>` : ''}</section>
   <section class="grp"><h3>הערות</h3><textarea class="reason" style="margin:0" data-f="snotes" data-id="${id}">${esc(s.notes)}</textarea>${s.ext ? `<p class="progress">בלוק חיצוני: ${esc(s.ext)}</p>` : ''}</section>
@@ -3862,7 +3862,7 @@ async function preparePublish() {
       snap[s.id] = {rows, shifts};
       if (i % 4 === 3) { document.getElementById('runBtn').textContent = `מצפין… ${i + 1}/${list.length}`; await new Promise(r => setTimeout(r, 0)); }
     }
-    const bundle = {kind: 'vrpub', v: 1, ver, pub: now, salt, it: PBKDF2_IT, year: {start: state.config.start, slots: state.config.slots, vac: state.config.vacBlocks}, entries: shuffle(entries, mulberry32(now % 100000))};
+    const bundle = {kind: 'vrpub', v: 1, ver, pub: now, salt, it: PBKDF2_IT, year: {start: state.config.start, slots: state.config.slots, vac: state.config.vacBlocks, shift: {days: (state.config.shift.days || []).slice(), holidays: String(state.config.shift.holidays || '')}}, entries: shuffle(entries, mulberry32(now % 100000))};
     state.publish = {ver, at: now, snap};
     state.pubBundle = JSON.stringify(bundle);
     persist('publish');

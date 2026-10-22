@@ -124,6 +124,22 @@ details summary{cursor:pointer;color:var(--muted);font-size:14px}
 .radio{display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);cursor:pointer;font-size:15px}
 .radio:has(input:checked){border-color:var(--scrub);background:var(--scrub-soft)}
 .foot{text-align:center;margin-top:30px}
+.cal{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:10px;margin:8px 0}
+.calnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.calnav b{font-size:16px}
+.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.calgrid .dh{font-size:12px;color:var(--muted);text-align:center;font-weight:600}
+.cd{appearance:none;min-height:44px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:15px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;line-height:1.1;min-width:0}
+.cd small{font-size:9.5px;font-weight:500;color:var(--warn);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd.hol{border-color:var(--warn);background:var(--warn-bg)}
+.cd.on{background:var(--alarm);border-color:var(--alarm);color:#fff}
+.cd.on small{color:#fff}
+.cd.bydow{background:repeating-linear-gradient(135deg,var(--alarm) 0 5px,color-mix(in srgb,var(--alarm) 75%,#000) 5px 10px)}
+.cd.off{background:transparent;border-color:transparent;color:var(--muted);opacity:.4;cursor:default;font-weight:400}
+.callegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+.callegend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-inline-end:4px;border:1px solid var(--line);background:var(--surface)}
+.callegend i.hol{background:var(--warn-bg);border-color:var(--warn)}
+.callegend i.on{background:var(--alarm);border-color:var(--alarm)}
 .linkbtn{appearance:none;border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer}
 </style>
 </head>
@@ -313,7 +329,7 @@ function cleanRequest(o) {
     vac: Array.isArray(o.vac) ? o.vac.map(date).filter(Boolean).slice(0, 3) : [],
     fixed: Array.isArray(o.fixed) ? o.fixed.slice(0, 6).map(r => ({c: str(r && r.c, 20), d: date(r && r.d)})).filter(r => r.c && r.d) : [],
     sh: {dows: (o.sh && Array.isArray(o.sh.dows) ? o.sh.dows : []).map(Number).filter(n => n >= 0 && n <= 6).slice(0, 7),
-      dates: (o.sh && Array.isArray(o.sh.dates) ? o.sh.dates : []).map(date).filter(Boolean).slice(0, 40), why: str(o.sh && o.sh.why, 300)},
+      dates: (o.sh && Array.isArray(o.sh.dates) ? o.sh.dates : []).map(date).filter(Boolean).slice(0, 150), why: str(o.sh && o.sh.why, 300)},
     notes: str(o.notes, 1000),
     secBk: o.secBk && o.secBk.c ? {c: str(o.secBk.c, 20), w: +o.secBk.w || 0} : null, freeBk: o.freeBk && o.freeBk.c ? {c: str(o.freeBk.c, 20), w: +o.freeBk.w || 0} : null,
     skills: !!o.skills, skillsDrop: Array.isArray(o.skillsDrop) ? o.skillsDrop.slice(0, 6).map(x => str(x, 20)) : [], tech: !!o.tech, early: str(o.early, 400),
@@ -326,7 +342,7 @@ function cleanChange(o) {
   const str = (v, n) => String(v ?? '').slice(0, n);
   const date = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v) : null;
   const type = CHG_TYPES[o.type] ? o.type : 'other', d = o.data || {};
-  const data = type === 'shift' ? {dates: (Array.isArray(d.dates) ? d.dates : []).map(date).filter(Boolean).slice(0, 40), dows: (Array.isArray(d.dows) ? d.dows : []).map(Number).filter(n => n >= 0 && n <= 6)}
+  const data = type === 'shift' ? {dates: (Array.isArray(d.dates) ? d.dates : []).map(date).filter(Boolean).slice(0, 150), dows: (Array.isArray(d.dows) ? d.dows : []).map(Number).filter(n => n >= 0 && n <= 6)}
     : type === 'shiftmove' ? {from: date(d.from), to: date(d.to)}
     : type === 'vac' ? {d: date(d.d)}
     : type === 'fixed' ? {c: str(d.c, 20), d: date(d.d)}
@@ -399,6 +415,57 @@ async function copyText(text, box) {
   if (box) { box.focus(); box.select(); } toast('סמנו והעתיקו ידנית.');
 }
 async function saveTxt(name, text) { if (!downloads) return; try { await downloads.save({filename: name, data: text}); } catch (e) { if (!e || e.code !== 'declined') toast('לא ניתן לשמור קובץ כאן – העתיקו את הקוד.'); } }
+
+// ---------- shift calendar: only shift days (Fridays, Saturdays and the holidays list) can be marked ----------
+// The days and holidays come with the published schedule; before the first publication the defaults below are used.
+const SHIFT_DEFAULT = {start: '2026-11-01', slots: 26, days: [5, 6], holidays: '2027-03-23 פורים\n2027-04-21 ערב פסח\n2027-04-22 פסח\n2027-04-27 ערב שביעי של פסח\n2027-04-28 שביעי של פסח\n2027-05-11 ערב יום העצמאות\n2027-05-12 יום העצמאות\n2027-06-10 ערב שבועות\n2027-06-11 שבועות\n2027-08-12 תשעה באב\n2027-10-01 ערב ראש השנה\n2027-10-02 ראש השנה א׳\n2027-10-03 ראש השנה ב׳\n2027-10-10 ערב יום כיפור\n2027-10-15 ערב סוכות\n2027-10-16 סוכות\n2027-10-22 ערב שמיני עצרת\n2027-10-23 שמיני עצרת'};
+const MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+let SC = null;
+function sc() {
+  if (SC) return SC;
+  const y = (PUB && PUB.year) || {}, s = y.shift || {};
+  const start = /^\d{4}-\d{2}-\d{2}$/.test(y.start || '') ? y.start : SHIFT_DEFAULT.start, slots = +y.slots > 0 ? +y.slots : SHIFT_DEFAULT.slots;
+  const days = Array.isArray(s.days) ? s.days.map(Number) : SHIFT_DEFAULT.days, hol = new Map();
+  String(typeof s.holidays === 'string' ? s.holidays : SHIFT_DEFAULT.holidays).split(/\r?\n/).forEach(l => { const m = l.trim().match(/^(\d{4}-\d{2}-\d{2})\s*(.*)$/); if (m) hol.set(m[1], m[2].trim() || 'חג'); });
+  const [a, b, c] = start.split('-').map(Number), end = addDays(new Date(a, b - 1, c), slots * 14 - 1);
+  return (SC = {startIso: start, endIso: isoOf(end), days, hol});
+}
+// a day on which shifts are assigned (null otherwise); Yom Kippur has no shifts
+function shiftDay(iso) {
+  const c = sc(); if (!iso || iso < c.startIso || iso > c.endIso) return null;
+  const hol = c.hol.get(iso) || '', dow = new Date(iso + 'T12:00:00').getDay();
+  if (/^יום כיפור/.test(hol) || (!hol && !c.days.includes(dow))) return null;
+  return {hol, dow};
+}
+// keep only constraints that can matter (old drafts may hold weekdays)
+function cleanShiftPicks(o) { const c = sc(); o.dows = (o.dows || []).filter(d => c.days.includes(d)); o.dates = (o.dates || []).filter(d => shiftDay(d)); }
+const cal = {pref: {open: false, m: ''}, chg: {open: false, m: ''}};
+function calHtml(k, o, minIso) {
+  const c = sc(), st = cal[k], sel = new Set(o.dates), first = c.startIso.slice(0, 7), last = c.endIso.slice(0, 7);
+  const DW = {5: ['כל ימי שישי', 'שישי'], 6: ['כל השבתות', 'שבת']};
+  const quick = [5, 6].filter(d => c.days.includes(d)).map(d => `<label><input type="checkbox" data-f="cal-dow" data-k="${k}" data-i="${d}" ${o.dows.includes(d) ? 'checked' : ''}> ${DW[d][0]}</label>`).join('');
+  const chips = o.dates.map((d, i) => { const h = c.hol.get(d); return `<button data-act="cal-del" data-k="${k}" data-i="${i}" aria-label="הסרת ${fmtIso(d)}">${fmtIso(d)}${h ? ' ' + esc(h) : ''} ✕</button>`; }).join('');
+  const summary = `<div class="chips">${chips || (o.dows.length ? '' : '<span class="muted">לא סומנו תאריכים</span>')}${o.dows.map(d => `<span class="muted">${DW[d] ? DW[d][0] : ''}</span>`).join(' · ')}</div>`;
+  if (!st.open) return summary + `<button class="btn" data-act="cal-open" data-k="${k}">📅 ${o.dates.length ? 'עריכה בלוח השנה' : 'סימון תאריכים בלוח השנה'}</button>`;
+  let m = st.m || ((minIso && minIso > c.startIso ? minIso : c.startIso).slice(0, 7));
+  if (m < first) m = first; if (m > last) m = last; st.m = m;
+  const [yy, mm] = m.split('-').map(Number), lead = new Date(yy, mm - 1, 1).getDay(), n = new Date(yy, mm, 0).getDate();
+  let cells = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'].map(x => `<span class="dh">${x}</span>`).join('') + '<span></span>'.repeat(lead);
+  const holHere = [];
+  for (let d = 1; d <= n; d++) {
+    const iso = `${m}-${String(d).padStart(2, '0')}`, info = shiftDay(iso);
+    if (!info || (minIso && iso < minIso)) { cells += `<span class="cd off">${d}</span>`; continue; }
+    if (info.hol) holHere.push(`${fmtIso(iso).slice(0, 5)} ${info.hol}`);
+    const byDow = o.dows.includes(info.dow), on = byDow || sel.has(iso);
+    cells += `<button type="button" class="cd${info.hol ? ' hol' : ''}${on ? ' on' : ''}${byDow ? ' bydow' : ''}" data-act="cal-day" data-k="${k}" data-d="${iso}" aria-pressed="${on}" title="${esc(fmtIso(iso) + ', יום ' + DOW[info.dow] + (info.hol ? ' – ' + info.hol : ''))}">${d}${info.hol ? `<small>${esc(info.hol)}</small>` : ''}</button>`;
+  }
+  return `<div class="dow" style="margin-bottom:6px">${quick}</div>
+    <div class="cal"><div class="calnav"><button class="btn sm" data-act="cal-nav" data-k="${k}" data-v="-1" ${m === first ? 'disabled' : ''}>› הקודם</button><b>${MONTHS[mm - 1]} ${yy}</b><button class="btn sm" data-act="cal-nav" data-k="${k}" data-v="1" ${m === last ? 'disabled' : ''}>הבא ‹</button></div>
+    <div class="calgrid">${cells}</div>
+    ${holHere.length ? `<p class="muted" style="margin:8px 0 0">חגים ומועדים בחודש הזה: ${holHere.map(esc).join(' · ')}</p>` : ''}
+    <div class="callegend"><span><i></i>יום תורנות</span><span><i class="hol"></i>חג או מועד</span><span><i class="on"></i>מסומן: לא לשבץ אותי</span><span style="opacity:.6">ימים אפורים: אין בהם תורנויות</span></div></div>
+    ${summary}<button class="btn sm" data-act="cal-open" data-k="${k}">סגירת לוח השנה</button>`;
+}
 
 // ---------- login ----------
 async function login(code, remember) {
@@ -480,10 +547,8 @@ function changeHtml() {
   const t = chg.type, cs = curSlot();
   const radios = Object.entries(CHG_TYPES).map(([k, v]) => `<label class="radio"><input type="radio" name="ctype" value="${k}" data-f="c-type" ${t === k ? 'checked' : ''}> ${v}</label>`).join('');
   let fields = '';
-  if (t === 'shift') fields = `<p class="sub">ימים או תאריכים שבהם אינכם יכולים לבצע תורנות מעכשיו והלאה. תורנויות שכבר נקבעו בתאריכים האלה יוזזו.</p>
-    <div class="dow">${DOW.map((d, i) => `<label><input type="checkbox" data-f="c-dow" data-i="${i}" ${chg.dows.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div>
-    <div class="chips">${chg.dates.map((d, i) => `<button data-act="c-date-del" data-i="${i}">${fmtIso(d)} ✕</button>`).join('') || '<span class="muted">לא נבחרו תאריכים</span>'}</div>
-    <div class="inline"><input type="date" id="cDateNew" min="${todayIso}"><button class="btn" data-act="c-date-add">הוספה</button></div>`;
+  if (t === 'shift') { cleanShiftPicks(chg); fields = `<p class="sub">תאריכים מעכשיו והלאה שבהם אינכם יכולים לבצע תורנות. בלוח השנה אפשר ללחוץ רק על ימי תורנות (שישי, שבת וחגים). תורנויות שכבר נקבעו בתאריכים האלה יוזזו.</p>
+    ${calHtml('chg', chg, todayIso)}`; }
   else if (t === 'shiftmove') { const fut = (me.shifts || []).filter(x => x.d >= todayIso);
     fields = `<label class="field"><span>איזו תורנות</span><select data-f="c-from"><option value="">בחירה…</option>${fut.map(x => `<option value="${x.d}" ${chg.from === x.d ? 'selected' : ''}>${fmtIso(x.d)}, יום ${DOW[new Date(x.d + 'T12:00:00').getDay()]}, ${SHIFT_T[x.t]}</option>`).join('')}</select></label>
       <label class="field"><span>תאריך מבוקש במקומה (לא חובה)</span><input type="date" data-f="c-to" min="${todayIso}" value="${esc(chg.to)}"></label>`; }
@@ -509,7 +574,7 @@ function changeHtml() {
 }
 function checkChange() {
   const e = [], t = chg.type;
-  if (t === 'shift' && !chg.dows.length && !chg.dates.length) e.push('סמנו לפחות יום או תאריך');
+  if (t === 'shift' && !chg.dows.length && !chg.dates.length) e.push('סמנו לפחות תאריך אחד בלוח השנה');
   if (t === 'shiftmove' && !chg.from) e.push('בחרו את התורנות להזזה');
   if (t === 'vac' && !chg.vd) e.push('בחרו תאריך');
   if (t === 'fixed' && (!chg.fc || !chg.fd)) e.push('בחרו קורס ותאריך');
@@ -554,6 +619,7 @@ const QA_RENT = 'יש לי רישיון נהיגה ואני מוכן/ה ויכו
 const qaOpts = (k, list) => `<option value="">בחירה…</option>` + list.map(v => `<option value="${esc(v)}" ${(f.qa || {})[k] === v ? 'selected' : ''}>${esc(v)}</option>`).join('');
 const qaYn = k => qaOpts(k, ['כן', 'לא']);
 function prefHtml() {
+  cleanShiftPicks(f.sh);
   const chosen = chosenCourses(), ext = chosen.filter(k => C[k].ext);
   const notes = chosen.map(k => C[k]).filter(c => c.appr || c.note).map(c => `<li><b>${esc(c.n)}:</b> ${esc([c.appr && c.appr.text + (c.appr.only1 ? ' (לבלוק של שבוע)' : '') + (c.appr.d30 ? ', לפחות 30 יום לפני הבלוק' : ''), c.appr && c.appr.form && 'בסיום: ' + c.appr.form, c.note].filter(Boolean).join('; '))}</li>`).join('');
   return `
@@ -606,11 +672,8 @@ function prefHtml() {
       <input type="date" data-f="fixd" data-i="${i}" value="${esc(r.d || '')}" aria-label="תאריך התחלה"><button class="icon-btn" data-act="fix-del" data-i="${i}" aria-label="הסרה">✕</button></div>`).join('')}
     <button class="btn ghost" data-act="fix-add" ${chosen.length ? '' : 'disabled'}>הוספת בלוק בתאריך קבוע</button>
   </section>
-  <section class="card"><h2><span class="step">7</span>אילוצי תורנויות</h2><p class="sub">15 תורנויות בשנה (10 חירום, 5 מחלקות) בסופי שבוע ובחגים. סמנו ימים או תאריכים שבהם אינכם יכולים לבצע תורנות.</p>
-    <div class="dow" role="group" aria-label="ימים שאינם אפשריים">${DOW.map((d, i) => `<label><input type="checkbox" data-f="dow" data-i="${i}" ${f.sh.dows.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div>
-    <span class="muted">תאריכים מסוימים</span>
-    <div class="chips">${f.sh.dates.map((d, i) => `<button data-act="shd-del" data-i="${i}" aria-label="הסרת ${fmtIso(d)}">${fmtIso(d)} ✕</button>`).join('') || '<span class="muted">לא נבחרו תאריכים</span>'}</div>
-    <div class="inline"><input type="date" id="shNew" aria-label="תאריך"><button class="btn" data-act="shd-add">הוספה</button></div>
+  <section class="card"><h2><span class="step">7</span>אילוצי תורנויות</h2><p class="sub">15 תורנויות בשנה (10 חירום, 5 מחלקות). תורנויות יש רק בשישי, בשבת ובחגים, ולכן בלוח השנה אפשר ללחוץ רק על הימים האלה. לחצו על כל תאריך שבו אינכם יכולים לבצע תורנות; לחיצה נוספת מבטלת.</p>
+    ${calHtml('pref', f.sh, '')}
     <label class="field" style="margin-top:12px"><span>סיבה (לא חובה)</span><input type="text" data-f="why" value="${esc(f.sh.why)}" maxlength="300"></label>
   </section>
   <section class="card"><h2><span class="step">8</span>הערות לרכז/ת</h2>
@@ -696,6 +759,19 @@ document.addEventListener('click', async e => {
     case 'admin-open': adminOpen = true; tab = 'admin'; render(); return;
     case 'login': { const code = document.getElementById('codeIn').value; if (!normCode(code)) { loginErr = 'הזינו את הקוד.'; render(); return; } login(code, document.getElementById('remember').checked); return; }
     case 'logout': logout(); return;
+    case 'cal-open': { const st = cal[t.dataset.k]; st.open = !st.open; break; }
+    case 'cal-nav': { const st = cal[t.dataset.k], [y, m] = st.m.split('-').map(Number), d = new Date(y, m - 1 + (+t.dataset.v), 1); st.m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; break; }
+    case 'cal-day': case 'cal-del': {
+      const k = t.dataset.k, o = k === 'pref' ? f.sh : chg;
+      if (a === 'cal-del') o.dates.splice(i, 1);
+      else {
+        const d = t.dataset.d, dw = new Date(d + 'T12:00:00').getDay();
+        if (o.dows.includes(dw)) { toast(dw === 6 ? 'כל השבתות כבר מסומנות. לביטול: הסירו את הסימון "כל השבתות".' : 'כל ימי שישי כבר מסומנים. לביטול: הסירו את הסימון "כל ימי שישי".'); return; }
+        const s = new Set(o.dates); if (s.has(d)) s.delete(d); else s.add(d); o.dates = [...s].sort();
+      }
+      if (k === 'pref') result = null; else chgResult = null;
+      break;
+    }
     case 'c-date-add': { const v = document.getElementById('cDateNew').value; if (!v) { toast('בחרו תאריך.'); return; } if (!chg.dates.includes(v)) chg.dates.push(v); chg.dates.sort(); break; }
     case 'c-date-del': chg.dates.splice(i, 1); break;
     case 'c-make': chgErrors = checkChange(); chgResult = chgErrors.length ? null : encodeRequest(buildChange()); render(); window.scrollTo(0, 0); return;
@@ -751,6 +827,7 @@ document.addEventListener('change', e => {
     else return;
     setTimeout(render, 0); return;
   }
+  if (k === 'cal-dow') { const o = t.dataset.k === 'pref' ? f.sh : chg, s = new Set(o.dows); if (t.checked) s.add(i); else s.delete(i); o.dows = [...s].sort(); if (t.dataset.k === 'pref') { result = null; saveDraft(); } else chgResult = null; setTimeout(render, 0); return; }
   if (k === 'me') f.me = t.value;
   else if (k === 'qa') { f.qa = {...f.qa, [t.dataset.q]: t.value}; saveDraft(); return; }
 else if (k === 'bk-c') { const key = t.dataset.cat === 'sec' ? 'secBk' : 'freeBk', c = C[t.value]; f[key] = c ? {c: t.value, w: c.len[c.len.length - 1]} : null; }
